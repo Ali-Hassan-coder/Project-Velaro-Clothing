@@ -1,13 +1,34 @@
-const mongoose = require('mongoose');
+const { Sequelize } = require('sequelize');
+
+const sequelize = new Sequelize(
+  process.env.PG_DATABASE || 'velaro_clothing',
+  process.env.PG_USER || 'postgres',
+  process.env.PG_PASSWORD || '1234',
+  {
+    host: process.env.PG_HOST || 'localhost',
+    port: process.env.PG_PORT || 5432,
+    dialect: 'postgres',
+    logging: process.env.NODE_ENV === 'development' ? false : false,
+    pool: {
+      max: 10,
+      min: 0,
+      acquire: 30000,
+      idle: 10000,
+    },
+  }
+);
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`✅ MongoDB Atlas connected: ${conn.connection.host}`);
+    await sequelize.authenticate();
+    console.log(`✅ PostgreSQL database connected successfully.`);
+    // Sync models
+    await sequelize.sync({ alter: true });
+    console.log(`✅ PostgreSQL tables synchronized.`);
   } catch (error) {
-    console.error(`❌ MongoDB connection error: ${error.message}`);
+    console.error(`❌ PostgreSQL connection error: ${error.message}`);
     process.exit(1);
   }
 };
 
-module.exports = { connectDB };
+module.exports = { sequelize, connectDB };

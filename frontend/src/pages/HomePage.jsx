@@ -8,41 +8,46 @@ const HomePage = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fallback high-impact images if DB hasn't been seeded yet
+  // Fallback high-impact images using local project assets
   const defaultCategories = [
     {
-      title: 'Leather Jackets',
-      divisionCode: 'DIV // 01',
+      name: 'Leather Jackets',
+      divisionNumber: '01',
+      divisionLabel: 'FLAGSHIP LINE',
       slug: 'leather-jackets',
-      imageUrl: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=800',
+      image: { url: '/photo_1.jpg' },
       description: '1.3mm Italian Full-Grain, YKK Excella Brass'
     },
     {
-      title: 'Heavyweight Hoodies',
-      divisionCode: 'DIV // 02',
+      name: 'Hoodies & Fleece',
+      divisionNumber: '02',
+      divisionLabel: '500 GSM LOOPBACK',
       slug: 'hoodies-sweatshirts',
-      imageUrl: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&q=80&w=800',
+      image: { url: '/photo11.jpg' },
       description: '500 GSM French Terry Cotton, Double-Faced'
     },
     {
-      title: 'Technical Streetwear',
-      divisionCode: 'DIV // 03',
+      name: 'Streetwear',
+      divisionNumber: '03',
+      divisionLabel: 'APPAREL',
       slug: 'streetwear',
-      imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800',
+      image: { url: '/photo4.jpg' },
       description: 'Cordura® Reinforced Cargo & Modular Systems'
     },
     {
-      title: 'Performance Sportswear',
-      divisionCode: 'DIV // 04',
+      name: 'Sportswear',
+      divisionNumber: '04',
+      divisionLabel: 'TECHNICAL',
       slug: 'sportswear',
-      imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&q=80&w=800',
+      image: { url: '/photo12.jpg' },
       description: 'Aerodynamic Compressive Engineered Fabrics'
     },
     {
-      title: 'Motorbike Riding Suits',
-      divisionCode: 'DIV // 05',
+      name: 'Motorbike Suits',
+      divisionNumber: '05',
+      divisionLabel: 'TRACK ARMOR',
       slug: 'motorbike-riding-suits',
-      imageUrl: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&q=80&w=800',
+      image: { url: '/photo5.jpg' },
       description: 'CE AAA Certified Racing Suits with D3O® Armor'
     }
   ];
@@ -80,7 +85,7 @@ const HomePage = () => {
         minHeight: '85vh',
         display: 'flex',
         alignItems: 'center',
-        background: 'linear-gradient(rgba(12, 13, 14, 0.45), rgba(12, 13, 14, 0.95)), url("https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=1920")',
+        background: 'linear-gradient(rgba(12, 13, 14, 0.55), rgba(12, 13, 14, 0.95)), url("/photo5.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center 35%',
         borderBottom: '1px solid rgba(223, 186, 115, 0.2)'
@@ -169,44 +174,48 @@ const HomePage = () => {
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: '1.5rem'
           }}>
-            {(categories.length > 0 ? categories : defaultCategories).map((cat, idx) => (
-              <Link
-                key={cat.slug || idx}
-                to={`/shop?category=${cat.slug}`}
-                className="atelier-card"
-                style={{
-                  height: '380px',
-                  position: 'relative',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-end',
-                  padding: '2rem',
-                  textDecoration: 'none',
-                  backgroundImage: `linear-gradient(to top, rgba(12, 13, 14, 0.95) 0%, rgba(12, 13, 14, 0.2) 60%, transparent 100%), url(${cat.imageUrl})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              >
-                <div style={{ position: 'relative', zIndex: 2 }}>
-                  <span style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.72rem',
-                    color: '#DFBA73',
-                    letterSpacing: '0.15em',
-                    display: 'block',
-                    marginBottom: '0.35rem'
-                  }}>
-                    {cat.divisionCode || `DIV // 0${idx + 1}`}
-                  </span>
-                  <h3 style={{ fontSize: '1.45rem', marginBottom: '0.5rem', color: '#FFF' }}>
-                    {cat.title}
-                  </h3>
-                  <p style={{ fontSize: '0.82rem', color: '#9DA3AF', lineHeight: 1.4 }}>
-                    {cat.description}
-                  </p>
-                </div>
-              </Link>
-            ))}
+            {(categories.length > 0 ? categories : defaultCategories).map((cat, idx) => {
+              const catImg = cat.image?.url || cat.imageUrl || `/photo_${(idx % 2) + 1}.jpg`;
+              return (
+                <Link
+                  key={cat.slug || idx}
+                  to={`/shop?category=${cat.slug}`}
+                  className="atelier-card"
+                  style={{
+                    height: '380px',
+                    position: 'relative',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                    padding: '2rem',
+                    textDecoration: 'none',
+                    backgroundImage: `linear-gradient(to top, rgba(12, 13, 14, 0.95) 0%, rgba(12, 13, 14, 0.25) 60%, transparent 100%), url(${catImg})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                >
+                  <div style={{ position: 'relative', zIndex: 2 }}>
+                    <span style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '0.72rem',
+                      color: '#DFBA73',
+                      letterSpacing: '0.15em',
+                      display: 'block',
+                      marginBottom: '0.35rem'
+                    }}>
+                      {cat.divisionNumber ? `DIV // ${cat.divisionNumber}` : `DIV // 0${idx + 1}`}
+                      {cat.divisionLabel ? ` • ${cat.divisionLabel}` : ''}
+                    </span>
+                    <h3 style={{ fontSize: '1.45rem', marginBottom: '0.5rem', color: '#FFF' }}>
+                      {cat.name || cat.title}
+                    </h3>
+                    <p style={{ fontSize: '0.82rem', color: '#9DA3AF', lineHeight: 1.4 }}>
+                      {cat.shortDescription || cat.description}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -229,7 +238,7 @@ const HomePage = () => {
               gap: '2rem'
             }}>
               {featuredProducts.map((p) => (
-                <ProductCard key={p._id} product={p} />
+                <ProductCard key={p._id || p.id} product={p} />
               ))}
             </div>
           ) : (
@@ -246,7 +255,7 @@ const HomePage = () => {
       {/* 5. BESPOKE ATELIER BANNER */}
       <section style={{
         padding: '6rem 0',
-        background: 'linear-gradient(rgba(12, 13, 14, 0.85), rgba(12, 13, 14, 0.85)), url("https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=1920")',
+        background: 'linear-gradient(rgba(12, 13, 14, 0.85), rgba(12, 13, 14, 0.85)), url("/photo_2.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         borderTop: '1px solid rgba(223, 186, 115, 0.15)',

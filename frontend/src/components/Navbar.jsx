@@ -183,7 +183,9 @@ const Navbar = () => {
                   OPERATIONS
                 </Link>
               )}
-              <span style={{ fontSize: '0.8rem', color: '#9DA3AF' }}>{user.name.split(' ')[0]}</span>
+              <span style={{ fontSize: '0.8rem', color: '#9DA3AF' }}>
+                {user.firstName || (user.name ? user.name.split(' ')[0] : 'Artisan')}
+              </span>
               <button
                 onClick={logout}
                 style={{

@@ -1,160 +1,163 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
+const Category = require('./Category');
 
-const productSchema = new mongoose.Schema(
+const Product = sequelize.define(
+  'Product',
   {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
     name: {
-      type: String,
-      required: [true, 'Product name is required'],
-      trim: true,
-      maxlength: 200,
+      type: DataTypes.STRING(200),
+      allowNull: false,
     },
     slug: {
-      type: String,
+      type: DataTypes.STRING,
       unique: true,
-      lowercase: true,
     },
     subtitle: {
-      type: String,
-      trim: true, // e.g. "1.3mm Gauge • Dual Asymmetric Raccagni Zips"
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     description: {
-      type: String,
-      required: [true, 'Product description is required'],
+      type: DataTypes.TEXT,
+      allowNull: false,
     },
     shortDescription: {
-      type: String, // Brief text for product cards
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     price: {
-      type: Number,
-      required: [true, 'Product price is required'],
-      min: 0,
+      type: DataTypes.FLOAT,
+      allowNull: false,
     },
     compareAtPrice: {
-      type: Number, // Original price for showing discount
-      min: 0,
+      type: DataTypes.FLOAT,
+      allowNull: true,
     },
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category',
-      required: [true, 'Product category is required'],
+    categoryId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: Category,
+        key: 'id',
+      },
     },
     sku: {
-      type: String,
+      type: DataTypes.STRING,
       unique: true,
-      sparse: true,
+      allowNull: true,
     },
-    // Product images (Cloudinary URLs)
-    images: [
-      {
-        url: { type: String, required: true },
-        publicId: { type: String }, // Cloudinary public ID for deletion
-        alt: { type: String, default: '' },
-        isPrimary: { type: Boolean, default: false },
-      },
-    ],
-    // Material & spec details (especially for leather products)
+    images: {
+      type: DataTypes.JSONB,
+      defaultValue: [],
+    },
     material: {
-      type: String, // e.g. "Full-Grain Aniline Cowhide", "500 GSM French Terry"
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     materialTag: {
-      type: String, // e.g. "GENUINE ITALIAN STEERHIDE", "NATURAL MERINO SHEARLING"
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     hideGauge: {
-      type: String, // e.g. "1.3mm", "1.4mm"
+      type: DataTypes.STRING,
+      allowNull: true,
     },
-    // Available sizes
-    sizes: [
-      {
-        label: { type: String, required: true }, // S, M, L, XL, XXL, 3XL
-        inStock: { type: Number, default: 0 },
-      },
-    ],
-    // Color variants
-    colors: [
-      {
-        name: { type: String },
-        hex: { type: String }, // e.g. "#000000"
-        swatch: { type: String }, // Cloudinary URL for swatch image
-      },
-    ],
-    // Badges & tags
-    badges: [
-      {
-        type: String, // e.g. "READY TO SHIP", "MADE-TO-ORDER", "ARMOR-READY (CE 2)"
-      },
-    ],
+    sizes: {
+      type: DataTypes.JSONB,
+      defaultValue: [],
+    },
+    colors: {
+      type: DataTypes.JSONB,
+      defaultValue: [],
+    },
+    badges: {
+      type: DataTypes.JSONB,
+      defaultValue: [],
+    },
     availabilityTag: {
-      type: String, // e.g. "ARTISAN BESTSELLER", "10-DAY BUILD", "ONLY 3 LEFT IN RUN"
+      type: DataTypes.STRING,
+      allowNull: true,
     },
-    // Ratings
     rating: {
-      type: Number,
-      default: 0,
-      min: 0,
-      max: 5,
+      type: DataTypes.FLOAT,
+      defaultValue: 0,
     },
     numReviews: {
-      type: Number,
-      default: 0,
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
-    // Tailoring options
     isTailored: {
-      type: Boolean,
-      default: false, // If true, shows "+Tailored" and "CUSTOM SIZE" button
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
     isMadeToOrder: {
-      type: Boolean,
-      default: false,
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
     buildTime: {
-      type: String, // e.g. "10-DAY BUILD"
+      type: DataTypes.STRING,
+      allowNull: true,
     },
-    // Additional features
-    features: [String], // e.g. ["CE Level 2 D3O® Impact Compatibility", "100% Full-Grain Aniline"]
-    // Armor package (for motorbike)
+    features: {
+      type: DataTypes.JSONB,
+      defaultValue: [],
+    },
     armorPackage: {
-      available: { type: Boolean, default: false },
-      description: String,
-      price: Number,
+      type: DataTypes.JSONB,
+      defaultValue: { available: false },
     },
-    // Stock management
     totalStock: {
-      type: Number,
-      default: 0,
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     isActive: {
-      type: Boolean,
-      default: true,
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
     },
     isFeatured: {
-      type: Boolean,
-      default: false,
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
-    // SEO
-    metaTitle: String,
-    metaDescription: String,
+    metaTitle: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    metaDescription: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
   },
   {
     timestamps: true,
+    hooks: {
+      beforeValidate: (prod) => {
+        if (prod.name && !prod.slug) {
+          prod.slug = prod.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '');
+        }
+      },
+    },
   }
 );
 
-// Generate slug from name before saving
-productSchema.pre('save', function (next) {
-  if (this.isModified('name') || !this.slug) {
-    this.slug = this.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
+// Associations
+Product.belongsTo(Category, { foreignKey: 'categoryId', as: 'category' });
+Category.hasMany(Product, { foreignKey: 'categoryId', as: 'products' });
+
+Product.prototype.toJSON = function () {
+  const values = { ...this.get() };
+  values._id = values.id;
+  if (values.category && values.category.toJSON) {
+    values.category = values.category.toJSON();
   }
-  next();
-});
+  return values;
+};
 
-// Index for search & filtering
-productSchema.index({ name: 'text', description: 'text', material: 'text' });
-productSchema.index({ category: 1, price: 1 });
-productSchema.index({ slug: 1 });
-productSchema.index({ isFeatured: 1 });
-productSchema.index({ isActive: 1 });
-
-module.exports = mongoose.model('Product', productSchema);
+module.exports = Product;

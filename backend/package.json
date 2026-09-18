@@ -8,7 +8,12 @@
     "dev": "node --watch server.js",
     "seed": "node seeds/seed.js"
   },
-  "keywords": ["clothing", "e-commerce", "leather", "streetwear"],
+  "keywords": [
+    "clothing",
+    "e-commerce",
+    "leather",
+    "streetwear"
+  ],
   "author": "Velaro Clothing",
   "license": "ISC",
   "type": "commonjs",
@@ -24,6 +29,8 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.10.1",
     "morgan": "^1.12.1",
-    "multer": "^2.4.0"
+    "multer": "^2.4.0",
+    "pg": "^8.23.0",
+    "sequelize": "^6.37.8"
   }
 }

@@ -19,7 +19,7 @@ const protect = catchAsync(async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select('-password');
+    const user = await User.findByPk(decoded.id);
 
     if (!user) {
       return next(new AppError('User no longer exists.', 401));
@@ -29,6 +29,7 @@ const protect = catchAsync(async (req, res, next) => {
       return next(new AppError('Account has been deactivated.', 401));
     }
 
+    user._id = user.id;
     req.user = user;
     next();
   } catch (error) {
@@ -52,7 +53,11 @@ const optionalAuth = catchAsync(async (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id).select('-password');
+      const user = await User.findByPk(decoded.id);
+      if (user) {
+        user._id = user.id;
+        req.user = user;
+      }
     } catch (error) {
       // Token invalid/expired — proceed without user
     }

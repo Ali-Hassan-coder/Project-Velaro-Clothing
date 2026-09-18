@@ -22,7 +22,7 @@ const ProductDetailPage = () => {
           const prod = res.data.data.product;
           setProduct(prod);
           if (prod.sizes && prod.sizes.length > 0) {
-            setSelectedSize(prod.sizes[0].size);
+            setSelectedSize(prod.sizes[0].label || prod.sizes[0].size || 'M');
           }
           if (prod.armorPackage?.available) {
             setSelectedArmor(prod.armorPackage.options?.[0]?.name || null);
@@ -56,9 +56,11 @@ const ProductDetailPage = () => {
     );
   }
 
-  const isSaved = isInWishlist(product._id);
+  const productId = product._id || product.id;
+  const isSaved = isInWishlist(productId);
+  const displayName = product.title || product.name;
   const images = product.images?.length > 0 ? product.images : [
-    { url: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=1200' }
+    { url: '/photo_1.jpg' }
   ];
 
   return (
@@ -66,9 +68,9 @@ const ProductDetailPage = () => {
       <div className="container">
         {/* Breadcrumbs */}
         <div style={{ fontSize: '0.8rem', color: '#8E949D', marginBottom: '2rem' }}>
-          <Link to="/" style={{ color: '#8E949D' }}>HOME</Link> /{' '}
-          <Link to="/shop" style={{ color: '#8E949D' }}>ARCHIVES</Link> /{' '}
-          <span style={{ color: '#DFBA73' }}>{product.title?.toUpperCase()}</span>
+          <Link to="/" style={{ color: '#8E949D', textDecoration: 'none' }}>HOME</Link> /{' '}
+          <Link to="/shop" style={{ color: '#8E949D', textDecoration: 'none' }}>ARCHIVES</Link> /{' '}
+          <span style={{ color: '#DFBA73' }}>{displayName?.toUpperCase()}</span>
         </div>
 
         <div style={{
@@ -90,7 +92,7 @@ const ProductDetailPage = () => {
             }}>
               <img
                 src={images[selectedImage]?.url || images[0].url}
-                alt={product.title}
+                alt={displayName}
                 style={{
                   position: 'absolute',
                   top: 0,
@@ -132,7 +134,7 @@ const ProductDetailPage = () => {
             {/* Division & Code */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
               <span className="badge-gold">
-                {product.category?.divisionCode || 'DIV // 01'} • {product.sku || 'VEL-SPEC-09'}
+                {product.category?.divisionNumber ? `DIV // ${product.category.divisionNumber}` : 'DIV // 01'} • {product.sku || 'VEL-SPEC-09'}
               </span>
               <button
                 onClick={() => toggleWishlist(product)}
@@ -149,8 +151,14 @@ const ProductDetailPage = () => {
             </div>
 
             <h1 style={{ fontSize: '2.4rem', marginBottom: '0.5rem', lineHeight: 1.15 }}>
-              {product.title}
+              {displayName}
             </h1>
+
+            {product.subtitle && (
+              <p style={{ color: '#8E949D', fontSize: '0.95rem', marginBottom: '1.2rem', fontFamily: 'var(--font-mono)' }}>
+                {product.subtitle}
+              </p>
+            )}
 
             {/* Price block */}
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -158,167 +166,184 @@ const ProductDetailPage = () => {
                 ${product.price}
               </span>
               {product.compareAtPrice && (
-                <span style={{ fontSize: '1.1rem', color: '#646B77', textDecoration: 'line-through' }}>
+                <span style={{ fontSize: '1rem', textDecoration: 'line-through', color: '#646B77' }}>
                   ${product.compareAtPrice}
+                </span>
+              )}
+              {product.availabilityTag && (
+                <span className="badge-tag" style={{ marginLeft: 'auto' }}>
+                  {product.availabilityTag}
                 </span>
               )}
             </div>
 
-            <p style={{ color: '#C2C8D2', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2rem' }}>
+            {/* Description */}
+            <p style={{ color: '#C2C8D2', lineHeight: 1.6, marginBottom: '2rem', fontSize: '0.95rem' }}>
               {product.description}
             </p>
 
-            {/* Material & Leather Hide Tag */}
-            {product.materialTag && (
-              <div style={{
-                background: 'rgba(223, 186, 115, 0.05)',
-                border: '1px solid rgba(223, 186, 115, 0.15)',
-                borderRadius: '6px',
-                padding: '1rem',
-                marginBottom: '1.75rem'
-              }}>
-                <div style={{ fontSize: '0.72rem', color: '#DFBA73', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.25rem' }}>
-                  Tannery & Spec Grade
-                </div>
-                <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>
-                  {product.materialTag}
-                </div>
-                {product.hideGauge && (
-                  <div style={{ fontSize: '0.8rem', color: '#8E949D', marginTop: '0.25rem' }}>
-                    Gauge: {product.hideGauge} (Track-spec abrasion resistance)
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Sizing selector */}
+            {/* Size Selector */}
             {product.sizes && product.sizes.length > 0 && (
-              <div style={{ marginBottom: '1.75rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <label style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#DFBA73' }}>
+              <div style={{ marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+                  <label style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#DFBA73' }}>
                     Select Size
                   </label>
-                  <span style={{ fontSize: '0.75rem', color: '#8E949D', cursor: 'pointer', textDecoration: 'underline' }}>
-                    Atelier Sizing Matrix
+                  <span style={{ fontSize: '0.75rem', color: '#8E949D', cursor: 'pointer' }}>
+                    Measurement Chart
                   </span>
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  {product.sizes.map((s) => (
-                    <button
-                      key={s.size}
-                      onClick={() => setSelectedSize(s.size)}
-                      style={{
-                        padding: '0.65rem 1.25rem',
-                        background: selectedSize === s.size ? '#DFBA73' : '#17191C',
-                        color: selectedSize === s.size ? '#0C0D0E' : '#FFF',
-                        border: selectedSize === s.size ? 'none' : '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '4px',
-                        fontWeight: 700,
-                        fontSize: '0.85rem',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {s.size}
-                    </button>
-                  ))}
+                <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                  {product.sizes.map((s, idx) => {
+                    const label = s.label || s.size || s;
+                    const isSelected = selectedSize === label;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedSize(label)}
+                        style={{
+                          minWidth: '48px',
+                          height: '48px',
+                          padding: '0 0.85rem',
+                          borderRadius: '4px',
+                          border: isSelected ? '1px solid #DFBA73' : '1px solid rgba(223, 186, 115, 0.2)',
+                          background: isSelected ? '#DFBA73' : 'rgba(255,255,255,0.03)',
+                          color: isSelected ? '#0C0D0E' : '#FFF',
+                          fontWeight: 700,
+                          fontFamily: 'var(--font-mono)',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s'
+                        }}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {/* Armor Package Addon (for Riding Suits & Jackets) */}
-            {product.armorPackage?.available && (
+            {/* Color swatches */}
+            {product.colors && product.colors.length > 0 && (
               <div style={{ marginBottom: '2rem' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#DFBA73', marginBottom: '0.5rem' }}>
-                  Armor Impact System
+                <label style={{ display: 'block', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#DFBA73', marginBottom: '0.6rem' }}>
+                  Atelier Leather Finish
                 </label>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  {product.armorPackage.options?.map((opt) => (
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  {product.colors.map((c, i) => (
                     <div
-                      key={opt.name}
-                      onClick={() => setSelectedArmor(opt.name)}
+                      key={i}
+                      title={c.name}
                       style={{
-                        padding: '0.75rem 1rem',
-                        background: selectedArmor === opt.name ? 'rgba(223, 186, 115, 0.1)' : '#17191C',
-                        border: selectedArmor === opt.name ? '1px solid #DFBA73' : '1px solid rgba(255,255,255,0.08)',
-                        borderRadius: '4px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        backgroundColor: c.hex,
+                        border: '2px solid rgba(223, 186, 115, 0.4)',
                         cursor: 'pointer'
                       }}
-                    >
-                      <span style={{ fontSize: '0.85rem' }}>{opt.name}</span>
-                      <span style={{ fontSize: '0.85rem', color: '#DFBA73', fontFamily: 'var(--font-mono)' }}>
-                        +${opt.additionalPrice || 0}
-                      </span>
-                    </div>
+                    />
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Action CTAs */}
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+            {/* Armor Package Option */}
+            {product.armorPackage?.available && (
+              <div className="atelier-card" style={{ padding: '1.25rem', marginBottom: '2rem', border: '1px solid rgba(202, 125, 75, 0.4)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#CA7D4B', textTransform: 'uppercase' }}>
+                    CE Level 2 Armor Package
+                  </span>
+                  <span style={{ fontFamily: 'var(--font-mono)', color: '#DFBA73', fontWeight: 700 }}>
+                    +${product.armorPackage.price || 120}
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.8rem', color: '#8E949D', marginBottom: '0.75rem' }}>
+                  {product.armorPackage.description || 'Full D3O® armor set for shoulders, elbows, and back.'}
+                </p>
+                {product.armorPackage.options?.map((opt, i) => (
+                  <label key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: '#FFF', cursor: 'pointer' }}>
+                    <input
+                      type="radio"
+                      name="armor"
+                      checked={selectedArmor === opt.name}
+                      onChange={() => setSelectedArmor(opt.name)}
+                    />
+                    {opt.name}
+                  </label>
+                ))}
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2.5rem' }}>
               <button
-                onClick={() => alert(`Piece added to bag: ${product.title} (Size: ${selectedSize})`)}
                 className="btn btn-primary"
-                style={{ flex: 1 }}
+                style={{ flex: 1, padding: '1rem' }}
+                onClick={() => alert(`Added ${displayName} (${selectedSize}) to Atelier Bag`)}
               >
-                Add To Atelier Bag
+                Acquire Piece • ${product.price}
               </button>
-              {product.isCustomizable && (
+              {product.isTailored && (
                 <button
-                  onClick={() => alert('Initiating Custom Bespoke Tailoring measurement intake.')}
                   className="btn btn-outline"
-                  style={{ flex: 1 }}
+                  onClick={() => alert('Opening Bespoke Measurement Specifier')}
                 >
-                  Custom Bespoke Size
+                  Custom Tailoring
                 </button>
               )}
             </div>
 
-            {/* Tabs for Technical Specs & Delivery */}
-            <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem' }}>
-              <div style={{ display: 'flex', gap: '2rem', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+            {/* Features / Tabs */}
+            <div style={{ borderTop: '1px solid rgba(223, 186, 115, 0.15)', paddingTop: '1.5rem' }}>
+              <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem' }}>
                 <button
                   onClick={() => setActiveTab('specs')}
                   style={{
+                    background: 'none',
+                    border: 'none',
+                    borderBottom: activeTab === 'specs' ? '2px solid #DFBA73' : '2px solid transparent',
                     color: activeTab === 'specs' ? '#DFBA73' : '#8E949D',
-                    borderBottom: activeTab === 'specs' ? '2px solid #DFBA73' : 'none',
-                    paddingBottom: '0.4rem',
-                    fontWeight: 600,
+                    paddingBottom: '0.5rem',
                     fontSize: '0.85rem',
-                    textTransform: 'uppercase'
+                    fontWeight: 700,
+                    cursor: 'pointer'
                   }}
                 >
-                  Craft Specs
+                  SPECIFICATIONS
                 </button>
                 <button
-                  onClick={() => setActiveTab('shipping')}
+                  onClick={() => setActiveTab('delivery')}
                   style={{
-                    color: activeTab === 'shipping' ? '#DFBA73' : '#8E949D',
-                    borderBottom: activeTab === 'shipping' ? '2px solid #DFBA73' : 'none',
-                    paddingBottom: '0.4rem',
-                    fontWeight: 600,
+                    background: 'none',
+                    border: 'none',
+                    borderBottom: activeTab === 'delivery' ? '2px solid #DFBA73' : '2px solid transparent',
+                    color: activeTab === 'delivery' ? '#DFBA73' : '#8E949D',
+                    paddingBottom: '0.5rem',
                     fontSize: '0.85rem',
-                    textTransform: 'uppercase'
+                    fontWeight: 700,
+                    cursor: 'pointer'
                   }}
                 >
-                  Courier & Delivery
+                  DISPATCH & COURIER
                 </button>
               </div>
 
               {activeTab === 'specs' ? (
-                <div style={{ fontSize: '0.85rem', color: '#9DA3AF', lineHeight: 1.6 }}>
-                  <p>• Handcrafted in single-craftsman workshops.</p>
-                  <p>• Heavy-gauge bonded nylon stitching throughout all high-impact stress lines.</p>
-                  <p>• Solid brass hardware with anti-tarnish black oxidation finish.</p>
-                </div>
+                <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.85rem', color: '#9DA3AF' }}>
+                  <li>• Material: <strong style={{ color: '#FFF' }}>{product.material || product.materialTag}</strong></li>
+                  {product.hideGauge && <li>• Hide Gauge: <strong style={{ color: '#FFF' }}>{product.hideGauge}</strong></li>}
+                  {product.features?.map((f, i) => (
+                    <li key={i}>• {f}</li>
+                  ))}
+                  <li>• Hardware: Solid Milled Antique Brass with Japanese Excella slider system</li>
+                </ul>
               ) : (
                 <div style={{ fontSize: '0.85rem', color: '#9DA3AF', lineHeight: 1.6 }}>
-                  <p>• Standard courier dispatch within 48 business hours.</p>
-                  <p>• Bespoke custom-measured garments require 2-3 weeks pattern and leather cutting time.</p>
-                  <p>• Fully insured worldwide express air transit.</p>
+                  <p>• Worldwide insured courier dispatch with tracked customs clearance.</p>
+                  <p>• Ready-to-ship pieces dispatched within 24–48 hours from our atelier.</p>
+                  <p>• Bespoke and Made-To-Order builds typically require 10–14 craftsmanship days.</p>
                 </div>
               )}
             </div>

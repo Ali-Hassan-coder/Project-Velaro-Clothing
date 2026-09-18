@@ -6,38 +6,49 @@ const AppError = require('../utils/AppError');
  * Get all active categories (sorted by displayOrder)
  */
 const getCategories = async () => {
-  const categories = await Category.find({ isActive: true })
-    .sort('displayOrder')
-    .lean();
+  const categories = await Category.findAll({
+    where: { isActive: true },
+    order: [['displayOrder', 'ASC']],
+  });
 
-  // Attach product count
-  for (const cat of categories) {
-    cat.productCount = await Product.countDocuments({ category: cat._id, isActive: true });
-  }
+  const categoriesJson = await Promise.all(
+    categories.map(async (cat) => {
+      const json = cat.toJSON();
+      json.productCount = await Product.count({
+        where: { categoryId: cat.id, isActive: true },
+      });
+      return json;
+    })
+  );
 
-  return categories;
+  return categoriesJson;
 };
 
 /**
  * Get a single category by slug or ID
  */
 const getCategoryBySlug = async (slug) => {
-  let category = await Category.findOne({ slug, isActive: true }).lean();
+  let category = await Category.findOne({ where: { slug, isActive: true } });
 
   if (!category) {
-    category = await Category.findOne({ _id: slug, isActive: true }).lean();
+    // If not found by slug, try by ID if it's a UUID
+    try {
+      category = await Category.findOne({ where: { id: slug, isActive: true } });
+    } catch {
+      // not a valid UUID format
+    }
   }
 
   if (!category) {
     throw new AppError('Category not found.', 404);
   }
 
-  category.productCount = await Product.countDocuments({
-    category: category._id,
-    isActive: true,
+  const categoryJson = category.toJSON();
+  categoryJson.productCount = await Product.count({
+    where: { categoryId: category.id, isActive: true },
   });
 
-  return category;
+  return categoryJson;
 };
 
 /**
@@ -51,15 +62,13 @@ const createCategory = async (categoryData) => {
  * Update a category (admin)
  */
 const updateCategory = async (categoryId, updateData) => {
-  const category = await Category.findByIdAndUpdate(categoryId, updateData, {
-    new: true,
-    runValidators: true,
-  });
+  const category = await Category.findByPk(categoryId);
 
   if (!category) {
     throw new AppError('Category not found.', 404);
   }
 
+  await category.update(updateData);
   return category;
 };
 
@@ -67,7 +76,10 @@ const updateCategory = async (categoryId, updateData) => {
  * Delete a category (admin) — soft delete
  */
 const deleteCategory = async (categoryId) => {
-  const productCount = await Product.countDocuments({ category: categoryId, isActive: true });
+  const productCount = await Product.count({
+    where: { categoryId, isActive: true },
+  });
+
   if (productCount > 0) {
     throw new AppError(
       `Cannot delete category with ${productCount} active products. Reassign products first.`,
@@ -75,16 +87,12 @@ const deleteCategory = async (categoryId) => {
     );
   }
 
-  const category = await Category.findByIdAndUpdate(
-    categoryId,
-    { isActive: false },
-    { new: true }
-  );
-
+  const category = await Category.findByPk(categoryId);
   if (!category) {
     throw new AppError('Category not found.', 404);
   }
 
+  await category.update({ isActive: false });
   return category;
 };
 

@@ -6,20 +6,25 @@ const { generateAccessToken, generateRefreshToken } = require('../utils/generate
  * Register a new user
  */
 const registerUser = async ({ firstName, lastName, email, password }) => {
-  // Check if user already exists
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ where: { email: email.toLowerCase().trim() } });
   if (existingUser) {
     throw new AppError('An account with this email already exists.', 400);
   }
 
-  const user = await User.create({ firstName, lastName, email, password });
+  const user = await User.create({
+    firstName,
+    lastName,
+    email: email.toLowerCase().trim(),
+    password,
+  });
 
-  const accessToken = generateAccessToken(user._id);
-  const refreshToken = generateRefreshToken(user._id);
+  const accessToken = generateAccessToken(user.id);
+  const refreshToken = generateRefreshToken(user.id);
 
   return {
     user: {
-      id: user._id,
+      id: user.id,
+      _id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
@@ -34,7 +39,7 @@ const registerUser = async ({ firstName, lastName, email, password }) => {
  * Login user with email and password
  */
 const loginUser = async ({ email, password }) => {
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ where: { email: email.toLowerCase().trim() } });
 
   if (!user) {
     throw new AppError('Invalid email or password.', 401);
@@ -49,12 +54,13 @@ const loginUser = async ({ email, password }) => {
     throw new AppError('Invalid email or password.', 401);
   }
 
-  const accessToken = generateAccessToken(user._id);
-  const refreshToken = generateRefreshToken(user._id);
+  const accessToken = generateAccessToken(user.id);
+  const refreshToken = generateRefreshToken(user.id);
 
   return {
     user: {
-      id: user._id,
+      id: user.id,
+      _id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
@@ -70,7 +76,7 @@ const loginUser = async ({ email, password }) => {
  * Get user profile
  */
 const getUserProfile = async (userId) => {
-  const user = await User.findById(userId);
+  const user = await User.findByPk(userId);
   if (!user) {
     throw new AppError('User not found.', 404);
   }
@@ -89,15 +95,12 @@ const updateUserProfile = async (userId, updateData) => {
     }
   });
 
-  const user = await User.findByIdAndUpdate(userId, filteredData, {
-    new: true,
-    runValidators: true,
-  });
-
+  const user = await User.findByPk(userId);
   if (!user) {
     throw new AppError('User not found.', 404);
   }
 
+  await user.update(filteredData);
   return user;
 };
 

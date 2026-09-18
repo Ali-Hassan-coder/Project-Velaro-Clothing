@@ -1,59 +1,45 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
+const User = require('./User');
 
-const orderSchema = new mongoose.Schema(
+const Order = sequelize.define(
+  'Order',
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    userId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: User,
+        key: 'id',
+      },
     },
     orderNumber: {
-      type: String,
+      type: DataTypes.STRING,
       unique: true,
     },
-    items: [
-      {
-        product: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Product',
-          required: true,
-        },
-        name: String,
-        image: String,
-        price: Number,
-        size: String,
-        color: String,
-        quantity: { type: Number, required: true, min: 1 },
-        isBespoke: { type: Boolean, default: false },
-        customMeasurements: {
-          chest: String,
-          waist: String,
-          shoulders: String,
-          sleeveLength: String,
-          notes: String,
-        },
-      },
-    ],
+    items: {
+      type: DataTypes.JSONB,
+      defaultValue: [],
+    },
     shippingAddress: {
-      street: String,
-      city: String,
-      state: String,
-      zipCode: String,
-      country: String,
+      type: DataTypes.JSONB,
+      defaultValue: {},
     },
     paymentMethod: {
-      type: String,
-      enum: ['card', 'bank_transfer', 'cod', 'mobile_wallet'],
-      default: 'card',
+      type: DataTypes.ENUM('card', 'bank_transfer', 'cod', 'mobile_wallet'),
+      defaultValue: 'card',
     },
     paymentStatus: {
-      type: String,
-      enum: ['pending', 'paid', 'failed', 'refunded'],
-      default: 'pending',
+      type: DataTypes.ENUM('pending', 'paid', 'failed', 'refunded'),
+      defaultValue: 'pending',
     },
     orderStatus: {
-      type: String,
-      enum: [
+      type: DataTypes.ENUM(
         'pending',
         'confirmed',
         'pattern_drafted',
@@ -62,36 +48,60 @@ const orderSchema = new mongoose.Schema(
         'quality_check',
         'dispatched',
         'delivered',
-        'cancelled',
-      ],
-      default: 'pending',
+        'cancelled'
+      ),
+      defaultValue: 'pending',
     },
-    subtotal: { type: Number, required: true },
-    shippingCost: { type: Number, default: 0 },
-    tax: { type: Number, default: 0 },
-    totalAmount: { type: Number, required: true },
-    notes: String,
-    trackingNumber: String,
-    estimatedDelivery: Date,
+    subtotal: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    shippingCost: {
+      type: DataTypes.FLOAT,
+      defaultValue: 0,
+    },
+    tax: {
+      type: DataTypes.FLOAT,
+      defaultValue: 0,
+    },
+    totalAmount: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    notes: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    trackingNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    estimatedDelivery: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     timestamps: true,
+    hooks: {
+      beforeValidate: (order) => {
+        if (!order.orderNumber) {
+          const prefix = 'VA';
+          const timestamp = Date.now().toString(36).toUpperCase();
+          const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+          order.orderNumber = `${prefix}-${timestamp}-${random}`;
+        }
+      },
+    },
   }
 );
 
-// Generate order number before saving
-orderSchema.pre('save', function (next) {
-  if (!this.orderNumber) {
-    const prefix = 'VA'; // Velaro Atelier
-    const timestamp = Date.now().toString(36).toUpperCase();
-    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-    this.orderNumber = `${prefix}-${timestamp}-${random}`;
-  }
-  next();
-});
+Order.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
-orderSchema.index({ user: 1, createdAt: -1 });
-orderSchema.index({ orderNumber: 1 });
-orderSchema.index({ orderStatus: 1 });
+Order.prototype.toJSON = function () {
+  const values = { ...this.get() };
+  values._id = values.id;
+  return values;
+};
 
-module.exports = mongoose.model('Order', orderSchema);
+module.exports = Order;

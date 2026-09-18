@@ -1,74 +1,83 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const categorySchema = new mongoose.Schema(
+const Category = sequelize.define(
+  'Category',
   {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
     name: {
-      type: String,
-      required: [true, 'Category name is required'],
-      trim: true,
+      type: DataTypes.STRING,
+      allowNull: false,
       unique: true,
     },
     slug: {
-      type: String,
+      type: DataTypes.STRING,
       unique: true,
-      lowercase: true,
     },
     description: {
-      type: String,
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
     shortDescription: {
-      type: String, // Brief text for category cards on homepage
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     image: {
-      url: { type: String, default: '' },
-      publicId: { type: String, default: '' },
+      type: DataTypes.JSONB,
+      defaultValue: { url: '', publicId: '' },
     },
-    // Division number & label (matching design: "01 // LEATHER JACKETS")
     divisionNumber: {
-      type: String, // "01", "02", "03", etc.
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     divisionLabel: {
-      type: String, // "FLAGSHIP LINE", "500 GSM LOOPBACK", etc.
+      type: DataTypes.STRING,
+      allowNull: true,
     },
-    // Category-specific badge
     badge: {
-      type: String, // e.g. "FLAGSHIP LINE", "500 GSM LOOPBACK"
+      type: DataTypes.STRING,
+      allowNull: true,
     },
-    // CTA link text
     ctaText: {
-      type: String,
-      default: 'VIEW COLLECTION →',
+      type: DataTypes.STRING,
+      defaultValue: 'VIEW COLLECTION →',
     },
     displayOrder: {
-      type: Number,
-      default: 0,
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     isActive: {
-      type: Boolean,
-      default: true,
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
     },
     productCount: {
-      type: Number,
-      default: 0,
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
   },
   {
     timestamps: true,
+    hooks: {
+      beforeValidate: (cat) => {
+        if (cat.name && !cat.slug) {
+          cat.slug = cat.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '');
+        }
+      },
+    },
   }
 );
 
-// Generate slug before saving
-categorySchema.pre('save', function (next) {
-  if (this.isModified('name') || !this.slug) {
-    this.slug = this.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
-  }
-  next();
-});
+Category.prototype.toJSON = function () {
+  const values = { ...this.get() };
+  values._id = values.id;
+  return values;
+};
 
-categorySchema.index({ slug: 1 });
-categorySchema.index({ displayOrder: 1 });
-
-module.exports = mongoose.model('Category', categorySchema);
+module.exports = Category;

@@ -17,16 +17,17 @@ export const categoryApi = {
 export const authApi = {
   login: (credentials) => api.post('/auth/login', credentials),
   register: (userData) => api.post('/auth/register', userData),
-  getMe: () => api.get('/auth/me'),
+  getMe: () => api.get('/auth/profile'),
   updateProfile: (data) => api.put('/auth/profile', data),
 };
 
 export const wishlistApi = {
   getWishlist: () => api.get('/wishlist'),
-  addToWishlist: (productId) => api.post(`/wishlist/${productId}`),
+  addToWishlist: (productId) => api.post('/wishlist', { productId }),
   removeFromWishlist: (productId) => api.delete(`/wishlist/${productId}`),
 };
 
 export const adminApi = {
-  getDashboardStats: () => api.get('/admin/stats'),
+  getDashboardStats: () => api.get('/admin/dashboard'),
+  getAdminProducts: (params) => api.get('/admin/products', { params }),
 };

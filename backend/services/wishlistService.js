@@ -1,77 +1,86 @@
 const Wishlist = require('../models/Wishlist');
+const Product = require('../models/Product');
+const Category = require('../models/Category');
 const AppError = require('../utils/AppError');
+
+/**
+ * Format populated wishlist
+ */
+const formatWishlist = async (wishlist) => {
+  const json = wishlist.toJSON();
+  const productItems = [];
+
+  for (const item of json.products || []) {
+    const prod = await Product.findByPk(item.productId, {
+      include: [{ model: Category, as: 'category', attributes: ['name', 'slug'] }],
+    });
+    if (prod) {
+      productItems.push({
+        product: prod.toJSON(),
+        addedAt: item.addedAt,
+      });
+    }
+  }
+
+  json.products = productItems;
+  return json;
+};
 
 /**
  * Get user's wishlist
  */
 const getWishlist = async (userId) => {
-  let wishlist = await Wishlist.findOne({ user: userId })
-    .populate({
-      path: 'products.product',
-      select: 'name slug price compareAtPrice images rating numReviews badges material sizes',
-      populate: { path: 'category', select: 'name slug' },
-    });
+  let wishlist = await Wishlist.findOne({ where: { userId } });
 
   if (!wishlist) {
-    wishlist = await Wishlist.create({ user: userId, products: [] });
+    wishlist = await Wishlist.create({ userId, products: [] });
   }
 
-  return wishlist;
+  return formatWishlist(wishlist);
 };
 
 /**
  * Add product to wishlist
  */
 const addToWishlist = async (userId, productId) => {
-  let wishlist = await Wishlist.findOne({ user: userId });
+  let wishlist = await Wishlist.findOne({ where: { userId } });
 
   if (!wishlist) {
     wishlist = await Wishlist.create({
-      user: userId,
-      products: [{ product: productId }],
+      userId,
+      products: [{ productId, addedAt: new Date() }],
     });
   } else {
-    // Check if product already in wishlist
-    const exists = wishlist.products.some(
-      (item) => item.product.toString() === productId
-    );
+    const currentProducts = [...(wishlist.products || [])];
+    const exists = currentProducts.some((item) => item.productId === productId);
 
     if (exists) {
       throw new AppError('Product already in wishlist.', 400);
     }
 
-    wishlist.products.push({ product: productId });
-    await wishlist.save();
+    currentProducts.push({ productId, addedAt: new Date() });
+    await wishlist.update({ products: currentProducts });
   }
 
-  return wishlist.populate({
-    path: 'products.product',
-    select: 'name slug price images rating badges',
-    populate: { path: 'category', select: 'name slug' },
-  });
+  return formatWishlist(wishlist);
 };
 
 /**
  * Remove product from wishlist
  */
 const removeFromWishlist = async (userId, productId) => {
-  const wishlist = await Wishlist.findOne({ user: userId });
+  const wishlist = await Wishlist.findOne({ where: { userId } });
 
   if (!wishlist) {
     throw new AppError('Wishlist not found.', 404);
   }
 
-  wishlist.products = wishlist.products.filter(
-    (item) => item.product.toString() !== productId
+  const updatedProducts = (wishlist.products || []).filter(
+    (item) => item.productId !== productId
   );
 
-  await wishlist.save();
-
-  return wishlist.populate({
-    path: 'products.product',
-    select: 'name slug price images rating badges',
-    populate: { path: 'category', select: 'name slug' },
-  });
+  await wishlist.update({ products: updatedProducts });
+  return formatWishlist(wishlist);
 };
 
 module.exports = {

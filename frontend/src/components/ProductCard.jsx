@@ -4,10 +4,15 @@ import { useWishlist } from '../context/WishlistContext';
 
 const ProductCard = ({ product }) => {
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const isSaved = isInWishlist(product._id);
+  const productId = product._id || product.id;
+  const isSaved = isInWishlist(productId);
 
-  // Pick primary image or fallback
-  const primaryImage = product.images?.[0]?.url || 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=800';
+  // Pick primary image or first available
+  const primaryImage =
+    product.images?.[0]?.url ||
+    (typeof product.images?.[0] === 'string' ? product.images[0] : '/photo_1.jpg');
+
+  const displayName = product.title || product.name || 'Atelier Garment';
 
   return (
     <div className="atelier-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
@@ -52,6 +57,7 @@ const ProductCard = ({ product }) => {
           justifyContent: 'center',
           color: isSaved ? '#DFBA73' : '#8E949D',
           fontSize: '1.1rem',
+          cursor: 'pointer',
           transition: 'all 0.2s'
         }}
       >
@@ -59,10 +65,10 @@ const ProductCard = ({ product }) => {
       </button>
 
       {/* Image container */}
-      <Link to={`/product/${product.slug}`} style={{ overflow: 'hidden', display: 'block', position: 'relative', paddingTop: '125%', background: '#16191D' }}>
+      <Link to={`/product/${product.slug || productId}`} style={{ overflow: 'hidden', display: 'block', position: 'relative', paddingTop: '125%', background: '#16191D' }}>
         <img
           src={primaryImage}
-          alt={product.title}
+          alt={displayName}
           style={{
             position: 'absolute',
             top: 0,
@@ -82,66 +88,74 @@ const ProductCard = ({ product }) => {
         {/* Category division code */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
           <span style={{ fontSize: '0.72rem', color: '#DFBA73', fontFamily: 'var(--font-mono)' }}>
-            {product.category?.divisionCode || 'DIV // 01'}
+            {product.category?.divisionNumber ? `DIV // ${product.category.divisionNumber}` : (product.category?.divisionCode || 'DIV // 01')}
           </span>
-          {product.ratings?.average > 0 && (
+          {(product.rating > 0 || product.ratings?.average > 0) && (
             <span style={{ fontSize: '0.75rem', color: '#CA7D4B' }}>
-              ★ {product.ratings.average.toFixed(1)} ({product.ratings.count})
+              ★ {(product.rating || product.ratings?.average || 5.0).toFixed(1)} ({product.numReviews || product.ratings?.count || 1})
             </span>
           )}
         </div>
 
         {/* Title */}
         <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.4rem', lineHeight: 1.3 }}>
-          <Link to={`/product/${product.slug}`} style={{ color: '#F5F5F7' }}>
-            {product.title}
+          <Link to={`/product/${product.slug || productId}`} style={{ color: '#F5F5F7', textDecoration: 'none' }}>
+            {displayName}
           </Link>
         </h3>
 
         {/* Material & Leather Tag */}
-        {product.materialTag && (
+        {(product.materialTag || product.material) && (
           <p style={{ fontSize: '0.78rem', color: '#8E949D', marginBottom: '0.8rem' }}>
-            {product.materialTag} {product.hideGauge ? `• ${product.hideGauge}` : ''}
+            {product.materialTag || product.material} {product.hideGauge ? `• ${product.hideGauge}` : ''}
           </p>
         )}
 
         {/* Sizes available preview */}
         {product.sizes && product.sizes.length > 0 && (
           <div style={{ display: 'flex', gap: '5px', marginBottom: '1rem', flexWrap: 'wrap' }}>
-            {product.sizes.slice(0, 5).map((s) => (
+            {product.sizes.map((s, i) => (
               <span
-                key={s.size}
+                key={i}
                 style={{
                   fontSize: '0.68rem',
                   padding: '2px 6px',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: '2px',
-                  color: s.stock > 0 ? '#C2C8D2' : '#555A63',
-                  textDecoration: s.stock === 0 ? 'line-through' : 'none'
+                  border: '1px solid rgba(223, 186, 115, 0.2)',
+                  borderRadius: '3px',
+                  color: '#C2C8D2',
+                  fontFamily: 'var(--font-mono)',
+                  background: 'rgba(255,255,255,0.02)'
                 }}
               >
-                {s.size}
+                {s.label || s.size || s}
               </span>
             ))}
           </div>
         )}
 
         {/* Price & Action */}
-        <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.85rem', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#DFBA73', fontFamily: 'var(--font-mono)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 'auto', paddingTop: '0.8rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
+          <div>
+            <span style={{ fontSize: '1.2rem', fontWeight: 700, color: '#DFBA73', fontFamily: 'var(--font-mono)' }}>
               ${product.price}
             </span>
             {product.compareAtPrice && (
-              <span style={{ fontSize: '0.75rem', color: '#646B77', textDecoration: 'line-through' }}>
+              <span style={{ fontSize: '0.8rem', textDecoration: 'line-through', color: '#646B77', marginLeft: '0.5rem' }}>
                 ${product.compareAtPrice}
               </span>
             )}
           </div>
-
-          <Link to={`/product/${product.slug}`} className="btn btn-outline btn-sm">
-            Inspect
+          <Link
+            to={`/product/${product.slug || productId}`}
+            style={{
+              fontSize: '0.78rem',
+              color: '#F5F5F7',
+              textDecoration: 'none',
+              fontWeight: 600,
+              letterSpacing: '0.04em'
+            }}
+          >
+            SPECIFY →
           </Link>
         </div>
       </div>

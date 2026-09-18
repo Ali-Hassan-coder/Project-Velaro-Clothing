@@ -1,96 +1,83 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
 const bcrypt = require('bcryptjs');
 
-const userSchema = new mongoose.Schema(
+const User = sequelize.define(
+  'User',
   {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
     firstName: {
-      type: String,
-      required: [true, 'First name is required'],
-      trim: true,
-      maxlength: 50,
+      type: DataTypes.STRING(50),
+      allowNull: false,
     },
     lastName: {
-      type: String,
-      required: [true, 'Last name is required'],
-      trim: true,
-      maxlength: 50,
+      type: DataTypes.STRING(50),
+      allowNull: false,
     },
     email: {
-      type: String,
-      required: [true, 'Email is required'],
+      type: DataTypes.STRING,
+      allowNull: false,
       unique: true,
-      lowercase: true,
-      trim: true,
-      match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email'],
+      validate: {
+        isEmail: true,
+      },
     },
     password: {
-      type: String,
-      required: [true, 'Password is required'],
-      minlength: [6, 'Password must be at least 6 characters'],
-      select: false, // Don't return password by default
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     role: {
-      type: String,
-      enum: ['customer', 'admin'],
-      default: 'customer',
+      type: DataTypes.ENUM('customer', 'admin'),
+      defaultValue: 'customer',
     },
     phone: {
-      type: String,
-      trim: true,
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     avatar: {
-      type: String,
-      default: '',
+      type: DataTypes.STRING,
+      defaultValue: '',
     },
-    addresses: [
-      {
-        label: { type: String, default: 'Home' },
-        street: String,
-        city: String,
-        state: String,
-        zipCode: String,
-        country: String,
-        isDefault: { type: Boolean, default: false },
-      },
-    ],
-    // For leather jackets & motorbike suits — custom measurements
+    addresses: {
+      type: DataTypes.JSONB,
+      defaultValue: [],
+    },
     measurements: {
-      chest: String,
-      waist: String,
-      shoulders: String,
-      sleeveLength: String,
-      height: String,
-      weight: String,
-      notes: String,
+      type: DataTypes.JSONB,
+      defaultValue: {},
     },
     isActive: {
-      type: Boolean,
-      default: true,
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
     },
   },
   {
     timestamps: true,
+    hooks: {
+      beforeSave: async (user) => {
+        if (user.changed('password')) {
+          const salt = await bcrypt.genSalt(12);
+          user.password = await bcrypt.hash(user.password, salt);
+        }
+      },
+    },
   }
 );
 
-// Hash password before saving
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-  const salt = await bcrypt.genSalt(12);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
-
-// Compare password method
-userSchema.methods.comparePassword = async function (candidatePassword) {
+// Method to compare password
+User.prototype.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Return full name virtual
-userSchema.virtual('fullName').get(function () {
-  return `${this.firstName} ${this.lastName}`;
-});
+// Helper to provide _id compatibility for frontend
+User.prototype.toJSON = function () {
+  const values = { ...this.get() };
+  values._id = values.id;
+  return values;
+};
 
-userSchema.set('toJSON', { virtuals: true });
-
-module.exports = mongoose.model('User', userSchema);
+module.exports = User;

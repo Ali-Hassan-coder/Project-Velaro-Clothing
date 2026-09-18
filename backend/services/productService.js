@@ -1,4 +1,6 @@
+const { Op } = require('sequelize');
 const Product = require('../models/Product');
+const Category = require('../models/Category');
 const AppError = require('../utils/AppError');
 
 /**
@@ -15,74 +17,77 @@ const getProducts = async (queryParams) => {
     sort = '-createdAt',
     material,
     isFeatured,
-    badges,
-    sizes,
   } = queryParams;
 
-  const filter = { isActive: true };
+  const where = { isActive: true };
 
   // Category filter
   if (category) {
-    filter.category = category;
+    // If slug provided or UUID
+    const matchedCategory = await Category.findOne({
+      where: {
+        [Op.or]: [{ id: category }, { slug: category }],
+      },
+    });
+    if (matchedCategory) {
+      where.categoryId = matchedCategory.id;
+    }
   }
 
-  // Search filter (text search)
+  // Search filter
   if (search) {
-    filter.$or = [
-      { name: { $regex: search, $options: 'i' } },
-      { description: { $regex: search, $options: 'i' } },
-      { material: { $regex: search, $options: 'i' } },
-      { materialTag: { $regex: search, $options: 'i' } },
+    where[Op.or] = [
+      { name: { [Op.iLike]: `%${search}%` } },
+      { description: { [Op.iLike]: `%${search}%` } },
+      { material: { [Op.iLike]: `%${search}%` } },
+      { materialTag: { [Op.iLike]: `%${search}%` } },
     ];
   }
 
   // Price range filter
   if (minPrice || maxPrice) {
-    filter.price = {};
-    if (minPrice) filter.price.$gte = Number(minPrice);
-    if (maxPrice) filter.price.$lte = Number(maxPrice);
+    where.price = {};
+    if (minPrice) where.price[Op.gte] = Number(minPrice);
+    if (maxPrice) where.price[Op.lte] = Number(maxPrice);
   }
 
   // Material filter
   if (material) {
-    filter.material = { $regex: material, $options: 'i' };
+    where.material = { [Op.iLike]: `%${material}%` };
   }
 
   // Featured filter
   if (isFeatured !== undefined) {
-    filter.isFeatured = isFeatured === 'true';
+    where.isFeatured = isFeatured === 'true' || isFeatured === true;
   }
 
-  // Badge filter
-  if (badges) {
-    filter.badges = { $in: badges.split(',') };
+  // Determine order
+  let order = [['createdAt', 'DESC']];
+  if (sort) {
+    if (sort === 'price') order = [['price', 'ASC']];
+    else if (sort === '-price') order = [['price', 'DESC']];
+    else if (sort === 'createdAt') order = [['createdAt', 'ASC']];
+    else if (sort === '-createdAt') order = [['createdAt', 'DESC']];
+    else if (sort === 'rating') order = [['rating', 'DESC']];
   }
 
-  // Size availability filter
-  if (sizes) {
-    filter['sizes.label'] = { $in: sizes.split(',') };
-    filter['sizes.inStock'] = { $gt: 0 };
-  }
+  const offset = (Number(page) - 1) * Number(limit);
 
-  const skip = (Number(page) - 1) * Number(limit);
-
-  const [products, total] = await Promise.all([
-    Product.find(filter)
-      .populate('category', 'name slug')
-      .sort(sort)
-      .skip(skip)
-      .limit(Number(limit))
-      .lean(),
-    Product.countDocuments(filter),
-  ]);
+  const { count: total, rows: products } = await Product.findAndCountAll({
+    where,
+    include: [{ model: Category, as: 'category', attributes: ['id', 'name', 'slug'] }],
+    order,
+    offset,
+    limit: Number(limit),
+  });
 
   return {
-    products,
+    products: products.map((p) => p.toJSON()),
     pagination: {
       currentPage: Number(page),
       totalPages: Math.ceil(total / Number(limit)),
       totalProducts: total,
-      hasMore: skip + products.length < total,
+      hasMore: offset + products.length < total,
     },
   };
 };
@@ -91,74 +96,89 @@ const getProducts = async (queryParams) => {
  * Get a single product by ID or slug
  */
 const getProductByIdOrSlug = async (identifier) => {
-  let product;
-
-  // Try finding by slug first, then by ID
-  product = await Product.findOne({ slug: identifier, isActive: true })
-    .populate('category', 'name slug');
+  let product = await Product.findOne({
+    where: { slug: identifier, isActive: true },
+    include: [{ model: Category, as: 'category', attributes: ['id', 'name', 'slug'] }],
+  });
 
   if (!product) {
-    product = await Product.findOne({ _id: identifier, isActive: true })
-      .populate('category', 'name slug');
+    try {
+      product = await Product.findOne({
+        where: { id: identifier, isActive: true },
+        include: [{ model: Category, as: 'category', attributes: ['id', 'name', 'slug'] }],
+      });
+    } catch {
+      // not UUID
+    }
   }
 
   if (!product) {
     throw new AppError('Product not found.', 404);
   }
 
-  return product;
+  return product.toJSON();
 };
 
 /**
  * Create a new product (admin)
  */
 const createProduct = async (productData) => {
+  if (productData.category && !productData.categoryId) {
+    productData.categoryId = productData.category;
+  }
   const product = await Product.create(productData);
-  return product.populate('category', 'name slug');
+  const reloaded = await Product.findByPk(product.id, {
+    include: [{ model: Category, as: 'category', attributes: ['id', 'name', 'slug'] }],
+  });
+  return reloaded.toJSON();
 };
 
 /**
  * Update a product (admin)
  */
 const updateProduct = async (productId, updateData) => {
-  const product = await Product.findByIdAndUpdate(productId, updateData, {
-    new: true,
-    runValidators: true,
-  }).populate('category', 'name slug');
+  const product = await Product.findByPk(productId);
 
   if (!product) {
     throw new AppError('Product not found.', 404);
   }
 
-  return product;
+  if (updateData.category && !updateData.categoryId) {
+    updateData.categoryId = updateData.category;
+  }
+
+  await product.update(updateData);
+  const reloaded = await Product.findByPk(productId, {
+    include: [{ model: Category, as: 'category', attributes: ['id', 'name', 'slug'] }],
+  });
+  return reloaded.toJSON();
 };
 
 /**
  * Delete a product (admin) — soft delete
  */
 const deleteProduct = async (productId) => {
-  const product = await Product.findByIdAndUpdate(
-    productId,
-    { isActive: false },
-    { new: true }
-  );
+  const product = await Product.findByPk(productId);
 
   if (!product) {
     throw new AppError('Product not found.', 404);
   }
 
-  return product;
+  await product.update({ isActive: false });
+  return product.toJSON();
 };
 
 /**
  * Get featured products for homepage
  */
 const getFeaturedProducts = async (limit = 8) => {
-  return Product.find({ isActive: true, isFeatured: true })
-    .populate('category', 'name slug')
-    .sort('-createdAt')
-    .limit(Number(limit))
-    .lean();
+  const products = await Product.findAll({
+    where: { isActive: true, isFeatured: true },
+    include: [{ model: Category, as: 'category', attributes: ['id', 'name', 'slug'] }],
+    order: [['createdAt', 'DESC']],
+    limit: Number(limit),
+  });
+  return products.map((p) => p.toJSON());
 };
 
 /**
@@ -166,30 +186,31 @@ const getFeaturedProducts = async (limit = 8) => {
  */
 const getAllProductsAdmin = async (queryParams) => {
   const { page = 1, limit = 20, category, search } = queryParams;
-  const filter = {};
+  const where = {};
 
-  if (category) filter.category = category;
+  if (category) {
+    where.categoryId = category;
+  }
+
   if (search) {
-    filter.$or = [
-      { name: { $regex: search, $options: 'i' } },
-      { sku: { $regex: search, $options: 'i' } },
+    where[Op.or] = [
+      { name: { [Op.iLike]: `%${search}%` } },
+      { sku: { [Op.iLike]: `%${search}%` } },
     ];
   }
 
-  const skip = (Number(page) - 1) * Number(limit);
+  const offset = (Number(page) - 1) * Number(limit);
 
-  const [products, total] = await Promise.all([
-    Product.find(filter)
-      .populate('category', 'name slug')
-      .sort('-createdAt')
-      .skip(skip)
-      .limit(Number(limit))
-      .lean(),
-    Product.countDocuments(filter),
-  ]);
+  const { count: total, rows: products } = await Product.findAndCountAll({
+    where,
+    include: [{ model: Category, as: 'category', attributes: ['id', 'name', 'slug'] }],
+    order: [['createdAt', 'DESC']],
+    offset,
+    limit: Number(limit),
+  });
 
   return {
-    products,
+    products: products.map((p) => p.toJSON()),
     pagination: {
       currentPage: Number(page),
       totalPages: Math.ceil(total / Number(limit)),

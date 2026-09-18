@@ -123,7 +123,7 @@ const ShopPage = () => {
                   cursor: 'pointer'
                 }}
               >
-                {c.title}
+                {c.name || c.title}
               </button>
             );
           })}
@@ -195,7 +195,7 @@ const ShopPage = () => {
             gap: '2rem'
           }}>
             {products.map((prod) => (
-              <ProductCard key={prod._id} product={prod} />
+              <ProductCard key={prod._id || prod.id} product={prod} />
             ))}
           </div>
         ) : (

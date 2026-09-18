@@ -4,6 +4,7 @@ const Category = require('../models/Category');
 const User = require('../models/User');
 const Order = require('../models/Order');
 const productService = require('../services/productService');
+const { Op } = require('sequelize');
 
 /**
  * @route   GET /api/admin/dashboard
@@ -12,49 +13,44 @@ const productService = require('../services/productService');
 const getDashboardStats = catchAsync(async (req, res) => {
   const [totalProducts, totalCategories, totalUsers, totalOrders, recentOrders] =
     await Promise.all([
-      Product.countDocuments({ isActive: true }),
-      Category.countDocuments({ isActive: true }),
-      User.countDocuments({ isActive: true }),
-      Order.countDocuments(),
-      Order.find()
-        .sort('-createdAt')
-        .limit(5)
-        .populate('user', 'firstName lastName email')
-        .lean(),
+      Product.count({ where: { isActive: true } }),
+      Category.count({ where: { isActive: true } }),
+      User.count({ where: { isActive: true } }),
+      Order.count(),
+      Order.findAll({
+        order: [['createdAt', 'DESC']],
+        limit: 5,
+        include: [{ model: User, as: 'user', attributes: ['firstName', 'lastName', 'email'] }],
+      }),
     ]);
 
-  // Revenue from paid orders
-  const revenueAgg = await Order.aggregate([
-    { $match: { paymentStatus: 'paid' } },
-    { $group: { _id: null, totalRevenue: { $sum: '$totalAmount' } } },
-  ]);
-  const totalRevenue = revenueAgg[0]?.totalRevenue || 0;
+  const totalRevenue = (await Order.sum('totalAmount', { where: { paymentStatus: 'paid' } })) || 0;
 
   // Products per category
-  const categoryStats = await Product.aggregate([
-    { $match: { isActive: true } },
-    { $group: { _id: '$category', count: { $sum: 1 }, totalValue: { $sum: '$price' } } },
-    {
-      $lookup: {
-        from: 'categories',
-        localField: '_id',
-        foreignField: '_id',
-        as: 'category',
-      },
-    },
-    { $unwind: '$category' },
-    { $project: { name: '$category.name', count: 1, totalValue: 1 } },
-    { $sort: { count: -1 } },
-  ]);
+  const categories = await Category.findAll({
+    where: { isActive: true },
+    include: [{ model: Product, as: 'products', where: { isActive: true }, required: false }],
+  });
+
+  const categoryStats = categories.map((cat) => {
+    const prods = cat.products || [];
+    const totalVal = prods.reduce((sum, p) => sum + (p.price || 0), 0);
+    return {
+      name: cat.name,
+      count: prods.length,
+      totalValue: totalVal,
+    };
+  });
 
   // Low stock alert (products with total stock <= 4)
-  const lowStockProducts = await Product.find({
-    isActive: true,
-    totalStock: { $lte: 4, $gt: 0 },
-  })
-    .select('name sku totalStock')
-    .limit(10)
-    .lean();
+  const lowStockProducts = await Product.findAll({
+    where: {
+      isActive: true,
+      totalStock: { [Op.lte]: 4, [Op.gt]: 0 },
+    },
+    attributes: ['id', 'name', 'sku', 'totalStock'],
+    limit: 10,
+  });
 
   res.json({
     success: true,
@@ -67,8 +63,8 @@ const getDashboardStats = catchAsync(async (req, res) => {
         totalRevenue,
       },
       categoryStats,
-      lowStockProducts,
-      recentOrders,
+      lowStockProducts: lowStockProducts.map((p) => p.toJSON()),
+      recentOrders: recentOrders.map((o) => o.toJSON()),
     },
   });
 });
