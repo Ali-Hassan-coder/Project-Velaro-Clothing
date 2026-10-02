@@ -12,6 +12,9 @@ export const productApi = {
 export const categoryApi = {
   getCategories: () => api.get('/categories'),
   getCategoryBySlug: (slug) => api.get(`/categories/${slug}`),
+  createCategory: (data) => api.post('/categories', data),
+  updateCategory: (id, data) => api.put(`/categories/${id}`, data),
+  deleteCategory: (id) => api.delete(`/categories/${id}`),
 };
 
 export const authApi = {
@@ -30,4 +33,8 @@ export const wishlistApi = {
 export const adminApi = {
   getDashboardStats: () => api.get('/admin/dashboard'),
   getAdminProducts: (params) => api.get('/admin/products', { params }),
+  getPublicSettings: () => api.get('/admin/settings/public'),
+  getSettings: () => api.get('/admin/settings'),
+  updateSetting: (key, value) => api.put(`/admin/settings/${key}`, { value }),
 };
+

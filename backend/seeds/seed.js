@@ -95,7 +95,7 @@ const seedData = async () => {
         {
           name: 'Motorbike Suits',
           slug: 'motorbike-riding-suits',
-          description: '1-Piece 1.0mm Kangaroo hides, aerodynamic speed humps, and titanium shoulder sliders.',
+          description: '1-Piece 1.0mm Kangaroo hides in carbon black and atelier gold accents, aerodynamic speed humps, and titanium shoulder sliders.',
           shortDescription: 'Motorbike Race Suits',
           image: { url: '/photo5.jpg' },
           divisionNumber: '05',

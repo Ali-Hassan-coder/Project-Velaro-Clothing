@@ -6,22 +6,34 @@ const WishlistContext = createContext(null);
 
 export const WishlistProvider = ({ children }) => {
   const { user } = useAuth();
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(() => {
+    try {
+      const cached = localStorage.getItem('velaro_guest_wishlist');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
   const [loading, setLoading] = useState(false);
 
   const fetchWishlist = async () => {
     if (!user) {
-      setItems([]);
+      try {
+        const cached = localStorage.getItem('velaro_guest_wishlist');
+        if (cached) setItems(JSON.parse(cached));
+      } catch {}
       return;
     }
     setLoading(true);
     try {
       const res = await wishlistApi.getWishlist();
       if (res.data?.success) {
-        setItems(res.data.data.items || []);
+        // Backend returns data.wishlist.products or data.items
+        const list = res.data.data?.wishlist?.products || res.data.data?.items || [];
+        setItems(list);
       }
-    } catch {
-      // ignore silently or fallback
+    } catch (err) {
+      console.warn('Wishlist sync warning:', err);
     } finally {
       setLoading(false);
     }
@@ -32,28 +44,45 @@ export const WishlistProvider = ({ children }) => {
   }, [user]);
 
   const toggleWishlist = async (product) => {
+    const productId = product._id || product.id;
+    const isSaved = items.some((item) => (item.product?._id || item.product?.id || item.product) === productId);
+
     if (!user) {
-      alert('Please log in to save items to your Atelier Wishlist.');
+      // Allow guest saving directly to local archive so it works seamlessly!
+      let updated;
+      if (isSaved) {
+        updated = items.filter((item) => (item.product?._id || item.product?.id || item.product) !== productId);
+      } else {
+        updated = [...items, { product, addedAt: new Date() }];
+      }
+      setItems(updated);
+      try {
+        localStorage.setItem('velaro_guest_wishlist', JSON.stringify(updated));
+      } catch {}
       return;
     }
-    const productId = product._id || product.id;
-    const isSaved = items.some((item) => (item.product?._id || item.product) === productId);
 
+    // Authenticated user sync
     try {
       if (isSaved) {
+        // Optimistic UI update
+        setItems((prev) => prev.filter((item) => (item.product?._id || item.product?.id || item.product) !== productId));
         await wishlistApi.removeFromWishlist(productId);
-        setItems((prev) => prev.filter((item) => (item.product?._id || item.product) !== productId));
       } else {
+        // Optimistic UI update
+        setItems((prev) => [...prev, { product, addedAt: new Date() }]);
         await wishlistApi.addToWishlist(productId);
-        await fetchWishlist();
       }
+      await fetchWishlist();
     } catch (err) {
       console.error('Failed to toggle wishlist:', err);
+      // Re-fetch to ensure sync
+      fetchWishlist();
     }
   };
 
   const isInWishlist = (productId) => {
-    return items.some((item) => (item.product?._id || item.product) === productId);
+    return items.some((item) => (item.product?._id || item.product?.id || item.product) === productId);
   };
 
   return (
@@ -62,6 +91,7 @@ export const WishlistProvider = ({ children }) => {
     </WishlistContext.Provider>
   );
 };
+
 
 export const useWishlist = () => {
   const ctx = useContext(WishlistContext);

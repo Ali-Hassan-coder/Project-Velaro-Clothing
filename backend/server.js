@@ -21,6 +21,10 @@ const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
+// Serve uploaded media statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
 // --------------- MIDDLEWARES ---------------
 
 // Security headers

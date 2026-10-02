@@ -133,34 +133,46 @@ const ProductCard = ({ product }) => {
           </div>
         )}
 
-        {/* Price & Action */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 'auto', paddingTop: '0.8rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
+        {/* Showcase Specifications & Inquiry Action */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: '0.85rem', borderTop: '1px solid rgba(223, 186, 115, 0.12)' }}>
           <div>
-            <span style={{ fontSize: '1.2rem', fontWeight: 700, color: '#DFBA73', fontFamily: 'var(--font-mono)' }}>
-              ${product.price}
+            <span style={{ fontSize: '0.72rem', letterSpacing: '0.12em', color: '#DFBA73', fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>
+              {product.isTailored ? 'MADE-TO-MEASURE' : 'ARCHIVAL SHOWCASE'}
             </span>
-            {product.compareAtPrice && (
-              <span style={{ fontSize: '0.8rem', textDecoration: 'line-through', color: '#646B77', marginLeft: '0.5rem' }}>
-                ${product.compareAtPrice}
-              </span>
-            )}
           </div>
           <Link
             to={`/product/${product.slug || productId}`}
             style={{
-              fontSize: '0.78rem',
+              fontSize: '0.75rem',
               color: '#F5F5F7',
               textDecoration: 'none',
-              fontWeight: 600,
-              letterSpacing: '0.04em'
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '4px 10px',
+              background: 'rgba(223, 186, 115, 0.1)',
+              border: '1px solid rgba(223, 186, 115, 0.25)',
+              borderRadius: '4px',
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.background = 'var(--color-gold)';
+              e.currentTarget.style.color = '#0C0D0E';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.background = 'rgba(223, 186, 115, 0.1)';
+              e.currentTarget.style.color = '#F5F5F7';
             }}
           >
-            SPECIFY →
+            EXPLORE PIECE →
           </Link>
         </div>
       </div>
     </div>
   );
 };
+
 
 export default ProductCard;

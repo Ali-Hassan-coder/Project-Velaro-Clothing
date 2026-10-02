@@ -7,12 +7,12 @@ const ShopPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryParam = searchParams.get('category') || '';
   const searchParam = searchParams.get('search') || '';
+  const sortParam = searchParams.get('sort') || 'newest';
+  const materialParam = searchParams.get('material') || 'all';
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState('newest');
-  const [materialFilter, setMaterialFilter] = useState('all');
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -35,13 +35,23 @@ const ShopPage = () => {
         const params = {
           category: categoryParam || undefined,
           search: searchParam || undefined,
-          sort: sortBy,
+          sort: sortParam,
+          material: materialParam !== 'all' ? materialParam : undefined,
+          limit: 50,
         };
         const res = await productApi.getProducts(params);
         if (res.data?.data?.products) {
           let list = res.data.data.products;
-          if (materialFilter !== 'all') {
-            list = list.filter((p) => p.materialTag?.toLowerCase().includes(materialFilter.toLowerCase()));
+          // Apply instant in-memory material filter safeguard to ensure perfect matching
+          if (materialParam && materialParam !== 'all') {
+            const query = materialParam.toLowerCase();
+            list = list.filter((p) => {
+              const mat = (p.material || '').toLowerCase();
+              const tag = (p.materialTag || '').toLowerCase();
+              const desc = (p.description || '').toLowerCase();
+              const name = (p.name || '').toLowerCase();
+              return mat.includes(query) || tag.includes(query) || desc.includes(query) || name.includes(query);
+            });
           }
           setProducts(list);
         }
@@ -52,16 +62,38 @@ const ShopPage = () => {
       }
     };
     fetchProducts();
-  }, [categoryParam, searchParam, sortBy, materialFilter]);
+  }, [categoryParam, searchParam, sortParam, materialParam]);
 
   const handleCategorySelect = (slug) => {
+    const newParams = new URLSearchParams(searchParams);
     if (slug === 'all') {
-      searchParams.delete('category');
+      newParams.delete('category');
     } else {
-      searchParams.set('category', slug);
+      newParams.set('category', slug);
     }
-    setSearchParams(searchParams);
+    setSearchParams(newParams);
   };
+
+  const handleSortChange = (newSort) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (newSort === 'newest') {
+      newParams.delete('sort');
+    } else {
+      newParams.set('sort', newSort);
+    }
+    setSearchParams(newParams);
+  };
+
+  const handleMaterialChange = (newMat) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (newMat === 'all') {
+      newParams.delete('material');
+    } else {
+      newParams.set('material', newMat);
+    }
+    setSearchParams(newParams);
+  };
+
 
   return (
     <div style={{ padding: '3.5rem 0 6rem 0' }}>
@@ -142,46 +174,54 @@ const ShopPage = () => {
             Showing <span style={{ color: '#DFBA73', fontWeight: 700 }}>{products.length}</span> pieces
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
             {/* Material dropdown */}
             <select
-              value={materialFilter}
-              onChange={(e) => setMaterialFilter(e.target.value)}
+              value={materialParam}
+              onChange={(e) => handleMaterialChange(e.target.value)}
               style={{
                 background: '#131518',
-                color: '#FFF',
-                border: '1px solid rgba(223, 186, 115, 0.2)',
+                color: '#DFBA73',
+                border: '1px solid rgba(223, 186, 115, 0.25)',
                 borderRadius: '4px',
-                padding: '0.45rem 0.85rem',
-                fontSize: '0.8rem'
+                padding: '0.5rem 0.85rem',
+                fontSize: '0.8rem',
+                cursor: 'pointer',
+                outline: 'none'
               }}
             >
               <option value="all">All Hides & Materials</option>
-              <option value="leather">Full-Grain Leather</option>
-              <option value="cotton">Heavy Cotton</option>
-              <option value="cordura">Cordura / Technical</option>
+              <option value="leather">Leather / Steerhide / Calfskin</option>
+              <option value="kangaroo">Kangaroo Hide (Track Spec)</option>
+              <option value="cotton">Heavy Combed French Terry</option>
+              <option value="denim">Raw Japanese Selvedge Denim</option>
+              <option value="membrane">Technical Membrane</option>
             </select>
 
             {/* Sort dropdown */}
             <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              value={sortParam}
+              onChange={(e) => handleSortChange(e.target.value)}
               style={{
                 background: '#131518',
-                color: '#FFF',
-                border: '1px solid rgba(223, 186, 115, 0.2)',
+                color: '#DFBA73',
+                border: '1px solid rgba(223, 186, 115, 0.25)',
                 borderRadius: '4px',
-                padding: '0.45rem 0.85rem',
-                fontSize: '0.8rem'
+                padding: '0.5rem 0.85rem',
+                fontSize: '0.8rem',
+                cursor: 'pointer',
+                outline: 'none'
               }}
             >
               <option value="newest">Sort: Newest First</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-              <option value="rating">Top Rated</option>
+              <option value="oldest">Sort: Archival Order (Oldest)</option>
+              <option value="rating">Sort: Top Rated Pieces</option>
+              <option value="name_asc">Sort: Title (A – Z)</option>
+              <option value="name_desc">Sort: Title (Z – A)</option>
             </select>
           </div>
         </div>
+
 
         {/* Product Grid */}
         {loading ? (

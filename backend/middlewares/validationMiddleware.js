@@ -43,7 +43,12 @@ const productQueryRules = [
   query('limit').optional().isInt({ min: 1, max: 50 }).withMessage('Limit must be between 1 and 50'),
   query('minPrice').optional().isFloat({ min: 0 }).withMessage('Min price must be positive'),
   query('maxPrice').optional().isFloat({ min: 0 }).withMessage('Max price must be positive'),
+  query('sort').optional().isString().trim(),
+  query('material').optional().isString().trim(),
+  query('category').optional().isString().trim(),
+  query('search').optional().isString().trim(),
 ];
+
 
 // --------------- CATEGORY VALIDATORS ---------------
 

@@ -79,55 +79,103 @@ const ProductDetailPage = () => {
           gap: '3.5rem',
           alignItems: 'start'
         }}>
-          {/* LEFT: GALLERY */}
+          {/* LEFT: GALLERY WITH PHOTO & VIDEO SHOWCASE */}
           <div>
             <div style={{
               borderRadius: '8px',
               overflow: 'hidden',
               background: '#131518',
-              border: '1px solid rgba(223, 186, 115, 0.2)',
+              border: '1px solid rgba(223, 186, 115, 0.25)',
               position: 'relative',
               paddingTop: '120%',
-              marginBottom: '1rem'
+              marginBottom: '1rem',
+              boxShadow: 'var(--shadow-gold-glow)'
             }}>
-              <img
-                src={images[selectedImage]?.url || images[0].url}
-                alt={displayName}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }}
-              />
+              {images[selectedImage]?.resourceType === 'video' ||
+               images[selectedImage]?.url?.match(/\.(mp4|webm|mov|ogg)$/i) ? (
+                <video
+                  src={images[selectedImage]?.url}
+                  controls
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                />
+              ) : (
+                <img
+                  src={images[selectedImage]?.url || images[0].url}
+                  alt={displayName}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    transition: 'transform 0.4s ease'
+                  }}
+                />
+              )}
             </div>
 
-            {/* Thumbnails */}
+            {/* Thumbnails supporting photo & video badges */}
             {images.length > 1 && (
-              <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto' }}>
-                {images.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setSelectedImage(i)}
-                    style={{
-                      width: '75px',
-                      height: '75px',
-                      borderRadius: '4px',
-                      overflow: 'hidden',
-                      border: selectedImage === i ? '2px solid var(--color-gold)' : '1px solid rgba(255,255,255,0.1)',
-                      padding: 0,
-                      background: '#131518',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <img src={img.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </button>
-                ))}
+              <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto', paddingBottom: '4px' }}>
+                {images.map((media, i) => {
+                  const isVid = media.resourceType === 'video' || media.url?.match(/\.(mp4|webm|mov|ogg)$/i);
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedImage(i)}
+                      style={{
+                        position: 'relative',
+                        width: '78px',
+                        height: '78px',
+                        borderRadius: '4px',
+                        overflow: 'hidden',
+                        border: selectedImage === i ? '2px solid var(--color-gold)' : '1px solid rgba(255,255,255,0.1)',
+                        padding: 0,
+                        background: '#131518',
+                        cursor: 'pointer',
+                        flexShrink: 0
+                      }}
+                    >
+                      {isVid ? (
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0C0D0E' }}>
+                          <span style={{ color: '#DFBA73', fontSize: '1.2rem' }}>▶</span>
+                        </div>
+                      ) : (
+                        <img src={media.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      )}
+                      {isVid && (
+                        <span style={{
+                          position: 'absolute',
+                          bottom: 2,
+                          right: 2,
+                          background: 'rgba(0,0,0,0.7)',
+                          color: '#DFBA73',
+                          fontSize: '0.55rem',
+                          padding: '1px 3px',
+                          borderRadius: '2px'
+                        }}>
+                          VIDEO
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
+
 
           {/* RIGHT: DETAILS & CONFIGURATOR */}
           <div>
@@ -160,37 +208,35 @@ const ProductDetailPage = () => {
               </p>
             )}
 
-            {/* Price block */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem', marginBottom: '1.5rem' }}>
-              <span style={{ fontSize: '2rem', fontWeight: 800, color: '#DFBA73', fontFamily: 'var(--font-mono)' }}>
-                ${product.price}
+            {/* Division Spec & Status */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#DFBA73', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em' }}>
+                SHOWCASE ARCHIVE • {product.sku || 'VEL-SPEC-09'}
               </span>
-              {product.compareAtPrice && (
-                <span style={{ fontSize: '1rem', textDecoration: 'line-through', color: '#646B77' }}>
-                  ${product.compareAtPrice}
-                </span>
-              )}
               {product.availabilityTag && (
-                <span className="badge-tag" style={{ marginLeft: 'auto' }}>
+                <span className="badge-gold">
                   {product.availabilityTag}
                 </span>
               )}
+              <span className="badge-tag">
+                {product.isTailored ? 'MADE-TO-MEASURE' : 'ATELIER CRAFT'}
+              </span>
             </div>
 
             {/* Description */}
-            <p style={{ color: '#C2C8D2', lineHeight: 1.6, marginBottom: '2rem', fontSize: '0.95rem' }}>
+            <p style={{ color: '#C2C8D2', lineHeight: 1.7, marginBottom: '2rem', fontSize: '1rem' }}>
               {product.description}
             </p>
 
-            {/* Size Selector */}
+            {/* Size & Pattern Spec */}
             {product.sizes && product.sizes.length > 0 && (
               <div style={{ marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
                   <label style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#DFBA73' }}>
-                    Select Size
+                    Available Pattern Profiles
                   </label>
-                  <span style={{ fontSize: '0.75rem', color: '#8E949D', cursor: 'pointer' }}>
-                    Measurement Chart
+                  <span style={{ fontSize: '0.75rem', color: '#8E949D' }}>
+                    Atelier Custom Sizing
                   </span>
                 </div>
                 <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
@@ -203,12 +249,12 @@ const ProductDetailPage = () => {
                         onClick={() => setSelectedSize(label)}
                         style={{
                           minWidth: '48px',
-                          height: '48px',
+                          height: '44px',
                           padding: '0 0.85rem',
                           borderRadius: '4px',
                           border: isSelected ? '1px solid #DFBA73' : '1px solid rgba(223, 186, 115, 0.2)',
-                          background: isSelected ? '#DFBA73' : 'rgba(255,255,255,0.03)',
-                          color: isSelected ? '#0C0D0E' : '#FFF',
+                          background: isSelected ? 'rgba(223, 186, 115, 0.2)' : 'rgba(255,255,255,0.03)',
+                          color: isSelected ? '#DFBA73' : '#FFF',
                           fontWeight: 700,
                           fontFamily: 'var(--font-mono)',
                           cursor: 'pointer',
@@ -255,8 +301,8 @@ const ProductDetailPage = () => {
                   <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#CA7D4B', textTransform: 'uppercase' }}>
                     CE Level 2 Armor Package
                   </span>
-                  <span style={{ fontFamily: 'var(--font-mono)', color: '#DFBA73', fontWeight: 700 }}>
-                    +${product.armorPackage.price || 120}
+                  <span style={{ fontFamily: 'var(--font-mono)', color: '#DFBA73', fontSize: '0.78rem' }}>
+                    INTEGRATED SPEC
                   </span>
                 </div>
                 <p style={{ fontSize: '0.8rem', color: '#8E949D', marginBottom: '0.75rem' }}>
@@ -276,24 +322,62 @@ const ProductDetailPage = () => {
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2.5rem' }}>
-              <button
-                className="btn btn-primary"
-                style={{ flex: 1, padding: '1rem' }}
-                onClick={() => alert(`Added ${displayName} (${selectedSize}) to Atelier Bag`)}
-              >
-                Acquire Piece • ${product.price}
-              </button>
-              {product.isTailored && (
+            {/* Showcase Inquiries with 1-Click Copy Atelier Spec Code */}
+            <div style={{
+              background: 'rgba(223, 186, 115, 0.05)',
+              border: '1px solid rgba(223, 186, 115, 0.2)',
+              borderRadius: '6px',
+              padding: '1.25rem',
+              marginBottom: '2.5rem'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: '#DFBA73', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                  ATELIER INQUIRY SPECIFICATION
+                </span>
+                <span style={{ fontSize: '0.72rem', color: '#9DA3AF' }}>
+                  Direct Message @velaroclothing_
+                </span>
+              </div>
+
+              <div style={{
+                background: '#070809',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                padding: '0.75rem 1rem',
+                borderRadius: '4px',
+                fontSize: '0.82rem',
+                fontFamily: 'var(--font-mono)',
+                color: '#F5F5F7',
+                marginBottom: '1rem',
+                wordBreak: 'break-all'
+              }}>
+                [VELARO SPEC: {displayName} | {product.sku || 'SKU-NONE'} | Size: {selectedSize || 'Bespoke'}{selectedArmor ? ` | Armor: ${selectedArmor}` : ''}]
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                 <button
-                  className="btn btn-outline"
-                  onClick={() => alert('Opening Bespoke Measurement Specifier')}
+                  type="button"
+                  className="btn btn-primary"
+                  style={{ flex: 1, padding: '0.85rem' }}
+                  onClick={() => {
+                    const text = `Hi Velaro Clothing Atelier! I'd like to inquire about this piece:\n\n[VELARO SPEC: ${displayName} | SKU: ${product.sku || 'CUSTOM'} | Size: ${selectedSize || 'Bespoke'}${selectedArmor ? ` | Armor: ${selectedArmor}` : ''}]\n\nCould you please share availability and commission timeline?`;
+                    navigator.clipboard?.writeText(text);
+                    window.open('https://www.instagram.com/velaroclothing_?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw==', '_blank');
+                  }}
                 >
-                  Custom Tailoring
+                  📋 Copy Spec & Open Instagram ↗
                 </button>
-              )}
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  style={{ padding: '0.85rem 1.25rem' }}
+                  onClick={() => toggleWishlist(product)}
+                >
+                  {isSaved ? '★ In Archive' : '☆ Save Piece'}
+                </button>
+              </div>
             </div>
+
+
 
             {/* Features / Tabs */}
             <div style={{ borderTop: '1px solid rgba(223, 186, 115, 0.15)', paddingTop: '1.5rem' }}>

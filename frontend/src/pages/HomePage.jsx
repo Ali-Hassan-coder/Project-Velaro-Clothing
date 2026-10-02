@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { productApi, categoryApi } from '../api';
+import { productApi, categoryApi, adminApi } from '../api';
 import ProductCard from '../components/ProductCard';
 
 const HomePage = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [heroSettings, setHeroSettings] = useState({
+    mediaUrl: '/photo5.jpg',
+    mediaType: 'image',
+    headline: 'Crafted Without Compromise.\nBorn for Road & Runway.',
+    subheadline: 'Raw motorsport durability forged with architectural streetwear aesthetics. Bespoke full-grain leather, heavy 500 GSM loopback cotton, and CE AAA-grade race protection.',
+    commissionBadge: 'AUTUMN / WINTER ATELIER RELEASE',
+    ctaText: 'Explore The Collection',
+    ctaLink: '/shop',
+  });
   const [loading, setLoading] = useState(true);
 
   // Fallback high-impact images using local project assets
@@ -55,9 +64,10 @@ const HomePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [prodRes, catRes] = await Promise.all([
+        const [prodRes, catRes, settingsRes] = await Promise.all([
           productApi.getFeaturedProducts().catch(() => ({ data: { data: { products: [] } } })),
           categoryApi.getCategories().catch(() => ({ data: { data: { categories: [] } } })),
+          adminApi.getPublicSettings().catch(() => null),
         ]);
         if (prodRes.data?.data?.products?.length > 0) {
           setFeaturedProducts(prodRes.data.data.products);
@@ -66,6 +76,12 @@ const HomePage = () => {
           setCategories(catRes.data.data.categories);
         } else {
           setCategories(defaultCategories);
+        }
+        if (settingsRes?.data?.data?.settings?.heroBanner) {
+          setHeroSettings((prev) => ({
+            ...prev,
+            ...settingsRes.data.data.settings.heroBanner,
+          }));
         }
       } catch (err) {
         console.error('Fetch error:', err);
@@ -77,45 +93,88 @@ const HomePage = () => {
     fetchData();
   }, []);
 
+  const isHeroVideo = heroSettings.mediaType === 'video' || heroSettings.mediaUrl?.match(/\.(mp4|webm|mov)$/i);
+
   return (
     <div>
-      {/* 1. HERO SECTION */}
+      {/* 1. HERO SECTION (Dynamic Video or Image Background) */}
       <section style={{
         position: 'relative',
-        minHeight: '85vh',
+        minHeight: '88vh',
         display: 'flex',
         alignItems: 'center',
-        background: 'linear-gradient(rgba(12, 13, 14, 0.55), rgba(12, 13, 14, 0.95)), url("/photo5.jpg")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center 35%',
-        borderBottom: '1px solid rgba(223, 186, 115, 0.2)'
+        overflow: 'hidden',
+        borderBottom: '1px solid rgba(223, 186, 115, 0.2)',
+        backgroundColor: '#0C0D0E'
       }}>
+        {/* Dynamic Background Media */}
+        {isHeroVideo ? (
+          <video
+            src={heroSettings.mediaUrl}
+            autoPlay
+            loop
+            muted
+            playsInline
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              zIndex: 1,
+              opacity: 0.45,
+            }}
+          />
+        ) : (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundImage: `linear-gradient(rgba(12, 13, 14, 0.55), rgba(12, 13, 14, 0.95)), url("${heroSettings.mediaUrl || '/photo5.jpg'}")`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 35%',
+            zIndex: 1,
+          }} />
+        )}
+
+        {/* Dark luxury overlay vignette */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'radial-gradient(circle at 50% 50%, rgba(12,13,14,0.3) 0%, rgba(12,13,14,0.85) 100%)',
+          zIndex: 1,
+          pointerEvents: 'none'
+        }} />
+
         <div className="container" style={{ position: 'relative', zIndex: 2, padding: '4rem 2rem' }}>
-          <div style={{ maxWidth: '800px' }}>
+          <div style={{ maxWidth: '820px' }}>
             <div className="badge-gold" style={{ marginBottom: '1.25rem' }}>
-              AUTUMN / WINTER ATELIER RELEASE
+              {heroSettings.commissionBadge || 'AUTUMN / WINTER ATELIER RELEASE'}
             </div>
             <h1 style={{
               fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
               lineHeight: 1.05,
               marginBottom: '1.5rem',
-              textTransform: 'uppercase'
+              textTransform: 'uppercase',
+              whiteSpace: 'pre-line'
             }}>
-              Crafted Without <span className="text-gold">Compromise.</span><br />
-              Born for Road & <span className="text-copper">Runway.</span>
+              {heroSettings.headline || 'Crafted Without Compromise.\nBorn for Road & Runway.'}
             </h1>
             <p style={{
               fontSize: '1.15rem',
               color: '#C2C8D2',
               lineHeight: 1.6,
               marginBottom: '2.5rem',
-              maxWidth: '620px'
+              maxWidth: '640px'
             }}>
-              Raw motorsport durability forged with architectural streetwear aesthetics. Bespoke full-grain leather, heavy 500 GSM loopback cotton, and CE AAA-grade race protection.
+              {heroSettings.subheadline || 'Raw motorsport durability forged with architectural streetwear aesthetics. Bespoke full-grain leather, heavy 500 GSM loopback cotton, and CE AAA-grade race protection.'}
             </p>
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <Link to="/shop" className="btn btn-primary">
-                Explore The Collection
+              <Link to={heroSettings.ctaLink || '/shop'} className="btn btn-primary">
+                {heroSettings.ctaText || 'Explore The Collection'}
               </Link>
               <Link to="/shop?category=motorbike-riding-suits" className="btn btn-outline">
                 Motorbike Suite Configurator
@@ -124,6 +183,7 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
 
       {/* 2. SPECIFICATION STATS BAR */}
       <section style={{

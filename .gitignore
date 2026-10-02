@@ -33,3 +33,7 @@ lerna-debug.log*
 # OS Files
 Thumbs.db
 .DS_Store
+
+# Uploads
+backend/uploads/*
+!backend/uploads/.gitkeep

@@ -118,11 +118,19 @@ button {
   margin: 0 auto;
   padding: 0 2rem;
 }
-@media (max-width: 768px) {
-  .container {
-    padding: 0 1.25rem;
+/* Responsive utilities */
+@media (max-width: 900px) {
+  .desktop-nav {
+    display: none !important;
+  }
+  .mobile-toggle {
+    display: block !important;
+  }
+  .hide-sm {
+    display: none !important;
   }
 }
+
 
 /* Buttons */
 .btn {
@@ -201,16 +209,62 @@ button {
   border: 1px solid var(--color-border);
 }
 
-/* Card base */
+/* Card base & Rich Micro-animations */
 .atelier-card {
   background: var(--bg-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  transition: all 0.3s ease;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+  position: relative;
+}
+.atelier-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(223, 186, 115, 0.04), transparent);
+  transition: left 0.75s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.atelier-card:hover::before {
+  left: 100%;
 }
 .atelier-card:hover {
   border-color: var(--color-border-glow);
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-gold-glow);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), var(--shadow-gold-glow);
 }
+
+/* Classic Smooth Animations */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes goldPulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(223, 186, 115, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(223, 186, 115, 0.45);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInScale 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pulse-gold {
+  animation: goldPulse 3s infinite ease-in-out;
+}
+

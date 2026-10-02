@@ -78,4 +78,50 @@ const getAdminProducts = catchAsync(async (req, res) => {
   res.json({ success: true, data: result });
 });
 
-module.exports = { getDashboardStats, getAdminProducts };
+/**
+ * @route   GET /api/admin/settings
+ * @desc    Get global site settings (e.g. hero banner video/image)
+ */
+const SiteSetting = require('../models/SiteSetting');
+
+const getSettings = catchAsync(async (req, res) => {
+  let settings = await SiteSetting.findAll();
+  const settingsMap = {};
+  for (const s of settings) {
+    settingsMap[s.key] = s.value;
+  }
+
+  // Provide defaults if not yet customized
+  if (!settingsMap.heroBanner) {
+    settingsMap.heroBanner = {
+      mediaUrl: '/photo5.jpg',
+      mediaType: 'image', // 'image' or 'video'
+      headline: 'Crafted Without Compromise.\nBorn for Road & Runway.',
+      subheadline: 'Raw motorsport durability forged with architectural streetwear aesthetics.',
+      commissionBadge: 'AUTUMN / WINTER ATELIER RELEASE',
+      ctaText: 'Explore The Collection',
+      ctaLink: '/shop',
+    };
+  }
+
+  res.json({ success: true, data: { settings: settingsMap } });
+});
+
+/**
+ * @route   PUT /api/admin/settings/:key
+ * @desc    Update a specific site setting
+ */
+const updateSetting = catchAsync(async (req, res) => {
+  const { key } = req.params;
+  const { value } = req.body;
+
+  let [setting] = await SiteSetting.upsert({
+    key,
+    value,
+  });
+
+  res.json({ success: true, message: 'Settings updated successfully.', data: { setting } });
+});
+
+module.exports = { getDashboardStats, getAdminProducts, getSettings, updateSetting };
+

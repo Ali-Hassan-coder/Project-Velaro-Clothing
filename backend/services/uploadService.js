@@ -1,59 +1,82 @@
 const cloudinary = require('../config/cloudinary');
-const AppError = require('../utils/AppError');
+const fs = require('fs');
 
 /**
- * Upload a single image to Cloudinary
+ * Upload a media file (image or video)
+ * If Cloudinary is configured, upload to Cloudinary. Otherwise, serve via local static URL.
  */
-const uploadImage = async (fileBuffer, folder = 'velaro-clothing/products') => {
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder,
-        resource_type: 'image',
-        transformation: [
-          { quality: 'auto', fetch_format: 'auto' },
-          { width: 1200, crop: 'limit' },
-        ],
-      },
-      (error, result) => {
-        if (error) {
-          reject(new AppError('Image upload failed.', 500));
-        } else {
-          resolve({
-            url: result.secure_url,
-            publicId: result.public_id,
-          });
-        }
-      }
-    );
+const uploadMediaFile = async (file, folder = 'velaro-clothing/media') => {
+  const isVideo = file.mimetype.startsWith('video/');
+  const resourceType = isVideo ? 'video' : 'image';
+  const hasCloudinary =
+    process.env.CLOUDINARY_CLOUD_NAME &&
+    process.env.CLOUDINARY_CLOUD_NAME !== 'your_cloud_name' &&
+    process.env.CLOUDINARY_API_KEY &&
+    process.env.CLOUDINARY_API_KEY !== 'your_api_key';
 
-    uploadStream.end(fileBuffer);
-  });
+  if (hasCloudinary) {
+    try {
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder,
+        resource_type: resourceType,
+        transformation: isVideo ? undefined : [
+          { quality: 'auto', fetch_format: 'auto' },
+          { width: 1600, crop: 'limit' },
+        ],
+      });
+      // remove local temp file if Cloudinary succeeds
+      try { fs.unlinkSync(file.path); } catch {}
+      return {
+        url: result.secure_url,
+        publicId: result.public_id,
+        resourceType,
+      };
+    } catch (err) {
+      console.warn('Cloudinary upload failed, falling back to local file:', err.message);
+    }
+  }
+
+  // Fallback: local static server url
+  const serverUrl = process.env.SERVER_URL || 'http://localhost:5000';
+  return {
+    url: `${serverUrl}/uploads/${file.filename}`,
+    publicId: file.filename,
+    resourceType,
+  };
 };
 
 /**
- * Upload multiple images to Cloudinary
+ * Upload multiple media files
  */
-const uploadMultipleImages = async (files, folder = 'velaro-clothing/products') => {
-  const uploadPromises = files.map((file) => uploadImage(file.buffer, folder));
+const uploadMultipleMedia = async (files, folder = 'velaro-clothing/media') => {
+  const uploadPromises = files.map((file) => uploadMediaFile(file, folder));
   return Promise.all(uploadPromises);
 };
 
 /**
- * Delete an image from Cloudinary
+ * Delete media
  */
 const deleteImage = async (publicId) => {
   try {
+    if (publicId && publicId.includes('-')) {
+      const path = require('path');
+      const localPath = path.join(__dirname, '..', 'uploads', publicId);
+      if (fs.existsSync(localPath)) {
+        fs.unlinkSync(localPath);
+      }
+    }
     await cloudinary.uploader.destroy(publicId);
     return true;
   } catch (error) {
-    console.error('Cloudinary delete error:', error);
     return false;
   }
 };
 
 module.exports = {
-  uploadImage,
-  uploadMultipleImages,
+  uploadMediaFile,
+  uploadMultipleMedia,
+  uploadImage: uploadMediaFile,
+  uploadMultipleImages: uploadMultipleMedia,
   deleteImage,
 };
+
