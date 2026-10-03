@@ -98,11 +98,15 @@ const Footer = () => {
               Bespoke Services
             </h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.65rem', fontSize: '0.85rem', color: '#8E949D' }}>
+              <li>
+                <Link to="/contact" style={{ color: '#DFBA73', fontWeight: 600 }}>
+                  ★ Initiate Custom Order →
+                </Link>
+              </li>
               <li>Custom Sizing & Pattern Drafting</li>
               <li>Hand-Selected Italian Full-Grain</li>
               <li>D3O® Level 2 Armor Integration</li>
               <li>Custom Embroidery & Patches</li>
-              <li>Atelier Lifetime Warranty</li>
             </ul>
           </div>
 

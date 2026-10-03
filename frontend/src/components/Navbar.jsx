@@ -98,13 +98,32 @@ const Navbar = () => {
             <span>@velaroclothing_</span>
           </a>
           <span style={{
-            color: '#DFBA73',
+            color: '#8E949D',
             fontSize: '0.72rem',
             fontFamily: 'var(--font-mono)',
             letterSpacing: '0.12em'
           }}>
-            COMMISSIONS OPEN
+            COMMISSIONS OPEN:
           </span>
+          <Link
+            to="/contact"
+            style={{
+              color: '#0C0D0E',
+              background: '#DFBA73',
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              fontFamily: 'var(--font-mono)',
+              letterSpacing: '0.1em',
+              padding: '3px 8px',
+              borderRadius: '3px',
+              textDecoration: 'none',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#F0D49C'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#DFBA73'}
+          >
+            ORDER CUSTOM →
+          </Link>
         </div>
       </div>
 
@@ -116,7 +135,7 @@ const Navbar = () => {
         width: '100%',
         padding: '0 2.5rem',
         minHeight: '84px',
-        gap: '2rem'
+        gap: '1.5rem'
       }}>
         {/* Brand Logo with Enhanced VC Emblem */}
         <Link
@@ -133,8 +152,8 @@ const Navbar = () => {
             src="/logo-gold.png"
             alt="Velaro Clothing Logo"
             style={{
-              width: '48px',
-              height: '48px',
+              width: '46px',
+              height: '46px',
               objectFit: 'contain',
               filter: 'drop-shadow(0 0 10px rgba(223, 186, 115, 0.45))'
             }}
@@ -145,9 +164,9 @@ const Navbar = () => {
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{
               fontFamily: 'var(--font-heading)',
-              fontSize: '1.75rem',
+              fontSize: '1.65rem',
               fontWeight: 800,
-              letterSpacing: '0.2em',
+              letterSpacing: '0.18em',
               color: '#F5F5F7',
               lineHeight: 1
             }}>
@@ -155,8 +174,8 @@ const Navbar = () => {
             </span>
             <span style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.62rem',
-              letterSpacing: '0.36em',
+              fontSize: '0.6rem',
+              letterSpacing: '0.34em',
               color: '#DFBA73',
               marginTop: '4px'
             }}>
@@ -165,16 +184,16 @@ const Navbar = () => {
           </div>
         </Link>
 
-        {/* Desktop Category Navigation with even space distribution */}
+        {/* Desktop Category Navigation with even space distribution including Contact */}
         <nav
           style={{
             display: 'flex',
             justifyContent: 'space-evenly',
             alignItems: 'center',
             flex: '1 1 auto',
-            maxWidth: '850px',
-            gap: '1rem',
-            margin: '0 1.5rem'
+            maxWidth: '920px',
+            gap: '0.75rem',
+            margin: '0 1rem'
           }}
           className="desktop-nav"
         >
@@ -214,6 +233,18 @@ const Navbar = () => {
             style={() => navLinkStyle(location.search.includes('motorbike-riding-suits'))}
           >
             Racing Suits
+          </NavLink>
+          <NavLink
+            to="/contact"
+            style={({ isActive }) => ({
+              ...navLinkStyle(isActive),
+              color: isActive ? '#DFBA73' : '#DFBA73',
+              fontWeight: 700,
+              letterSpacing: '0.09em',
+              borderBottom: isActive ? '2px solid #DFBA73' : '2px solid rgba(223, 186, 115, 0.4)',
+            })}
+          >
+            Custom Order
           </NavLink>
         </nav>
 
@@ -432,6 +463,17 @@ const Navbar = () => {
               style={() => navLinkStyle(location.search.includes('motorbike-riding-suits'))}
             >
               Racing Suits
+            </NavLink>
+            <NavLink
+              to="/contact"
+              onClick={() => setMobileMenuOpen(false)}
+              style={({ isActive }) => ({
+                ...navLinkStyle(isActive),
+                color: '#DFBA73',
+                fontWeight: 700
+              })}
+            >
+              ★ Custom Bespoke Order
             </NavLink>
           </div>
 

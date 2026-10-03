@@ -10,6 +10,7 @@ import ProductDetailPage from './pages/ProductDetailPage';
 import LoginPage from './pages/LoginPage';
 import WishlistPage from './pages/WishlistPage';
 import AdminDashboard from './pages/AdminDashboard';
+import ContactPage from './pages/ContactPage';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/shop" element={<ShopPage />} />
                 <Route path="/product/:slug" element={<ProductDetailPage />} />
+                <Route path="/contact" element={<ContactPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/wishlist" element={<WishlistPage />} />
                 <Route path="/admin" element={<AdminDashboard />} />

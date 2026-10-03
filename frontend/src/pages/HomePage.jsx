@@ -329,7 +329,7 @@ const HomePage = () => {
           <p style={{ color: '#C2C8D2', fontSize: '1rem', lineHeight: 1.6, marginBottom: '2.5rem' }}>
             From individual rider aerodynamic measurements to exclusive hide choices and custom-machined metal hardware, our master tailors accept private commissions worldwide.
           </p>
-          <Link to="/shop?category=motorbike-riding-suits" className="btn btn-primary">
+          <Link to="/contact" className="btn btn-primary">
             Initiate Bespoke Order
           </Link>
         </div>
