@@ -70,7 +70,7 @@ const Navbar = () => {
           </span>
         </div>
 
-        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
           <a
             href="https://www.instagram.com/velaroclothing_?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw=="
             target="_blank"
@@ -97,33 +97,78 @@ const Navbar = () => {
             </svg>
             <span>@velaroclothing_</span>
           </a>
-          <span style={{
-            color: '#8E949D',
-            fontSize: '0.72rem',
-            fontFamily: 'var(--font-mono)',
-            letterSpacing: '0.12em'
-          }}>
-            COMMISSIONS OPEN:
-          </span>
-          <Link
-            to="/contact"
-            style={{
-              color: '#0C0D0E',
-              background: '#DFBA73',
-              fontSize: '0.7rem',
-              fontWeight: 700,
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{
+              color: '#8E949D',
+              fontSize: '0.72rem',
               fontFamily: 'var(--font-mono)',
-              letterSpacing: '0.1em',
-              padding: '3px 8px',
-              borderRadius: '3px',
-              textDecoration: 'none',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#F0D49C'}
-            onMouseLeave={(e) => e.currentTarget.style.background = '#DFBA73'}
-          >
-            ORDER CUSTOM →
-          </Link>
+              letterSpacing: '0.12em'
+            }}>
+              COMMISSIONS:
+            </span>
+            <Link
+              to="/contact"
+              style={{
+                color: '#0C0D0E',
+                background: '#DFBA73',
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                fontFamily: 'var(--font-mono)',
+                letterSpacing: '0.08em',
+                padding: '3px 8px',
+                borderRadius: '3px',
+                textDecoration: 'none',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#F0D49C'}
+              onMouseLeave={(e) => e.currentTarget.style.background = '#DFBA73'}
+            >
+              ORDER CUSTOM →
+            </Link>
+          </div>
+
+          <span style={{ width: '1px', height: '14px', background: 'rgba(223, 186, 115, 0.3)' }} />
+
+          {/* User Sign In / Profile located on the upper border line */}
+          {user ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <span style={{ fontSize: '0.72rem', color: '#DFBA73', fontFamily: 'var(--font-mono)' }}>
+                {user.firstName || user.email.split('@')[0]}
+              </span>
+              <button
+                onClick={logout}
+                style={{
+                  fontSize: '0.68rem',
+                  color: '#8E949D',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  padding: '2px 6px',
+                  borderRadius: '3px',
+                  cursor: 'pointer'
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <NavLink
+              to="/login"
+              style={({ isActive }) => ({
+                fontSize: '0.72rem',
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+                color: isActive ? '#DFBA73' : '#F5F5F7',
+                border: '1px solid rgba(223, 186, 115, 0.3)',
+                padding: '3px 9px',
+                borderRadius: '3px',
+                textDecoration: 'none',
+                background: isActive ? 'rgba(223, 186, 115, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+                transition: 'all 0.2s'
+              })}
+            >
+              Sign In
+            </NavLink>
+          )}
         </div>
       </div>
 
@@ -184,16 +229,15 @@ const Navbar = () => {
           </div>
         </Link>
 
-        {/* Desktop Category Navigation with even space distribution including Contact */}
+        {/* Desktop Category Navigation with equal spacing and aesthetic divider lines */}
         <nav
           style={{
             display: 'flex',
-            justifyContent: 'space-evenly',
+            justifyContent: 'space-between',
             alignItems: 'center',
             flex: '1 1 auto',
-            maxWidth: '920px',
-            gap: '0.75rem',
-            margin: '0 1rem'
+            maxWidth: '1000px',
+            margin: '0 1.5rem'
           }}
           className="desktop-nav"
         >
@@ -204,45 +248,57 @@ const Navbar = () => {
           >
             All Works
           </NavLink>
+
+          <span style={{ width: '1px', height: '16px', background: 'rgba(223, 186, 115, 0.2)' }} />
+
           <NavLink
             to="/shop?category=leather-jackets"
             style={() => navLinkStyle(location.search.includes('leather-jackets'))}
           >
             Leather Jackets
           </NavLink>
+
+          <span style={{ width: '1px', height: '16px', background: 'rgba(223, 186, 115, 0.2)' }} />
+
           <NavLink
             to="/shop?category=hoodies-sweatshirts"
             style={() => navLinkStyle(location.search.includes('hoodies-sweatshirts'))}
           >
             Heavy Hoodies
           </NavLink>
+
+          <span style={{ width: '1px', height: '16px', background: 'rgba(223, 186, 115, 0.2)' }} />
+
           <NavLink
             to="/shop?category=streetwear"
             style={() => navLinkStyle(location.search.includes('streetwear'))}
           >
             Streetwear
           </NavLink>
+
+          <span style={{ width: '1px', height: '16px', background: 'rgba(223, 186, 115, 0.2)' }} />
+
           <NavLink
             to="/shop?category=sportswear"
             style={() => navLinkStyle(location.search.includes('sportswear'))}
           >
             Sportswear
           </NavLink>
+
+          <span style={{ width: '1px', height: '16px', background: 'rgba(223, 186, 115, 0.2)' }} />
+
           <NavLink
             to="/shop?category=motorbike-riding-suits"
             style={() => navLinkStyle(location.search.includes('motorbike-riding-suits'))}
           >
             Racing Suits
           </NavLink>
+
+          <span style={{ width: '1px', height: '16px', background: 'rgba(223, 186, 115, 0.2)' }} />
+
           <NavLink
             to="/contact"
-            style={({ isActive }) => ({
-              ...navLinkStyle(isActive),
-              color: isActive ? '#DFBA73' : '#DFBA73',
-              fontWeight: 700,
-              letterSpacing: '0.09em',
-              borderBottom: isActive ? '2px solid #DFBA73' : '2px solid rgba(223, 186, 115, 0.4)',
-            })}
+            style={({ isActive }) => navLinkStyle(isActive || location.pathname === '/contact')}
           >
             Custom Order
           </NavLink>
@@ -250,7 +306,7 @@ const Navbar = () => {
 
 
         {/* Right utility navigation */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', flexShrink: 0 }}>
           {/* Quick Search */}
           <form onSubmit={handleSearch} className="hide-sm" style={{ position: 'relative' }}>
             <input
@@ -326,47 +382,6 @@ const Navbar = () => {
             </NavLink>
           )}
 
-          {/* User Profile or Login */}
-          {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-              <span style={{ fontSize: '0.8rem', color: '#9DA3AF', fontFamily: 'var(--font-mono)' }} className="hide-sm">
-                {user.firstName || user.email.split('@')[0]}
-              </span>
-              <button
-                onClick={logout}
-                style={{
-                  fontSize: '0.75rem',
-                  color: '#8E949D',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  padding: '0.35rem 0.65rem',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            <NavLink
-              to="/login"
-              style={({ isActive }) => ({
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                letterSpacing: '0.06em',
-                color: isActive ? '#DFBA73' : '#F5F5F7',
-                border: '1px solid rgba(223, 186, 115, 0.3)',
-                padding: '0.4rem 0.9rem',
-                borderRadius: '4px',
-                textDecoration: 'none',
-                background: isActive ? 'rgba(223, 186, 115, 0.1)' : 'transparent',
-                transition: 'all 0.2s'
-              })}
-            >
-              Sign In
-            </NavLink>
-          )}
-
-
           {/* Mobile Menu Toggle Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -377,7 +392,6 @@ const Navbar = () => {
               background: 'transparent',
               border: '1px solid rgba(223, 186, 115, 0.3)',
               borderRadius: '4px',
-
               padding: '0.4rem 0.6rem',
               color: '#DFBA73',
               fontSize: '1.2rem',
