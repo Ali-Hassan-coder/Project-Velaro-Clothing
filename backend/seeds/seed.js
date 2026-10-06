@@ -234,7 +234,7 @@ const seedData = async () => {
           materialTag: 'STREETWEAR DENIM',
           images: [
             { url: '/photo4.jpg', alt: 'Brutalist Modular Cargos', isPrimary: true },
-            { url: '/photo7.jpg', alt: 'Cargo Detail' },
+            { url: '/photo_7.jpg', alt: 'Cargo Detail' },
           ],
           sizes: [
             { size: 'S', label: 'S', inStock: 12 },
@@ -289,7 +289,7 @@ const seedData = async () => {
           hideGauge: '1.0mm',
           images: [
             { url: '/photo5.jpg', alt: 'Apex Velocity Suit', isPrimary: true },
-            { url: '/photo7.jpg', alt: 'Armor Detail' },
+            { url: '/photo_7.jpg', alt: 'Armor Detail' },
             { url: '/photo10.jpg', alt: 'Circuit Action' },
           ],
           sizes: [
