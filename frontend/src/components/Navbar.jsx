@@ -19,13 +19,13 @@ const Navbar = () => {
   };
 
   const navLinkStyle = (isActive) => ({
-    fontSize: '0.82rem',
+    fontSize: '0.74rem',
     fontWeight: 600,
-    letterSpacing: '0.08em',
+    letterSpacing: '0.07em',
     textTransform: 'uppercase',
     color: isActive ? '#DFBA73' : '#9DA3AF',
     borderBottom: isActive ? '2px solid #DFBA73' : '2px solid transparent',
-    paddingBottom: '4px',
+    paddingBottom: '3px',
     transition: 'all 0.2s ease',
     textDecoration: 'none'
   });
@@ -43,16 +43,16 @@ const Navbar = () => {
       <div style={{
         backgroundColor: '#070809',
         borderBottom: '1px solid rgba(223, 186, 115, 0.12)',
-        fontSize: '0.7rem',
-        padding: '0.4rem 1.5rem',
-        minHeight: '36px',
+        fontSize: '0.67rem',
+        padding: '0.3rem 1.25rem',
+        minHeight: '32px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         color: '#9DA3AF',
         letterSpacing: '0.04em',
         width: '100%',
-        maxWidth: '1240px',
+        maxWidth: '1140px',
         margin: '0 auto'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
@@ -174,17 +174,17 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Main navigation - Balanced Proportion Container */}
+      {/* Main navigation - Calibrated Proportions */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
-        maxWidth: '1240px',
+        maxWidth: '1140px',
         margin: '0 auto',
-        padding: '0 1.5rem',
-        minHeight: '68px',
-        gap: '1.25rem'
+        padding: '0 1.25rem',
+        minHeight: '58px',
+        gap: '1rem'
       }}>
         {/* Brand Logo with Enhanced VC Emblem */}
         <Link
@@ -192,7 +192,7 @@ const Navbar = () => {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '10px',
+            gap: '8px',
             textDecoration: 'none',
             flexShrink: 0
           }}
@@ -201,10 +201,10 @@ const Navbar = () => {
             src="/logo-gold.png"
             alt="Velaro Clothing Logo"
             style={{
-              width: '36px',
-              height: '36px',
+              width: '30px',
+              height: '30px',
               objectFit: 'contain',
-              filter: 'drop-shadow(0 0 8px rgba(223, 186, 115, 0.4))'
+              filter: 'drop-shadow(0 0 6px rgba(223, 186, 115, 0.35))'
             }}
             onError={(e) => {
               e.currentTarget.src = '/logo-light.png';
@@ -213,9 +213,9 @@ const Navbar = () => {
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{
               fontFamily: 'var(--font-heading)',
-              fontSize: '1.35rem',
+              fontSize: '1.2rem',
               fontWeight: 800,
-              letterSpacing: '0.15em',
+              letterSpacing: '0.14em',
               color: '#F5F5F7',
               lineHeight: 1
             }}>
@@ -223,8 +223,8 @@ const Navbar = () => {
             </span>
             <span style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.55rem',
-              letterSpacing: '0.28em',
+              fontSize: '0.5rem',
+              letterSpacing: '0.24em',
               color: '#DFBA73',
               marginTop: '2px'
             }}>
@@ -239,9 +239,9 @@ const Navbar = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '1.4rem',
+            gap: '1.15rem',
             flex: '1 1 auto',
-            margin: '0 1rem',
+            margin: '0 0.75rem',
             whiteSpace: 'nowrap'
           }}
           className="desktop-nav"
@@ -298,7 +298,7 @@ const Navbar = () => {
         </nav>
 
         {/* Right utility navigation */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
           {/* Quick Search */}
           <form onSubmit={handleSearch} className="hide-sm" style={{ position: 'relative' }}>
             <input
@@ -310,11 +310,11 @@ const Navbar = () => {
                 background: 'rgba(255, 255, 255, 0.04)',
                 border: '1px solid rgba(223, 186, 115, 0.2)',
                 borderRadius: '4px',
-                padding: '0.35rem 0.75rem',
-                fontSize: '0.75rem',
+                padding: '0.3rem 0.65rem',
+                fontSize: '0.72rem',
                 color: '#FFF',
                 outline: 'none',
-                width: '150px',
+                width: '135px',
                 transition: 'all 0.2s'
               }}
             />
@@ -327,12 +327,12 @@ const Navbar = () => {
             style={({ isActive }) => ({
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '5px',
               color: isActive ? '#DFBA73' : '#F5F5F7',
               textDecoration: 'none',
-              fontSize: '0.78rem',
+              fontSize: '0.74rem',
               fontWeight: 600,
-              padding: '0.35rem 0.75rem',
+              padding: '0.3rem 0.65rem',
               borderRadius: '20px',
               background: isActive ? 'rgba(223, 186, 115, 0.15)' : 'rgba(255, 255, 255, 0.04)',
               border: isActive ? '1px solid #DFBA73' : '1px solid rgba(223, 186, 115, 0.2)',
@@ -340,12 +340,12 @@ const Navbar = () => {
               whiteSpace: 'nowrap'
             })}
           >
-            <span style={{ color: '#DFBA73', fontSize: '0.9rem' }}>★</span>
+            <span style={{ color: '#DFBA73', fontSize: '0.82rem' }}>★</span>
             <span className="hide-sm">SAVED</span>
             <span style={{
               background: 'var(--color-gold)',
               color: '#0C0D0E',
-              fontSize: '0.68rem',
+              fontSize: '0.64rem',
               fontWeight: 800,
               padding: '1px 5px',
               borderRadius: '10px'

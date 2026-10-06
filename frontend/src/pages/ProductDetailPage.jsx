@@ -75,22 +75,22 @@ const ProductDetailPage = () => {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: '2.5rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
+          gap: '2rem',
           alignItems: 'start'
         }}>
           {/* LEFT: GALLERY WITH PHOTO & VIDEO SHOWCASE */}
-          <div style={{ position: 'sticky', top: '90px' }}>
+          <div style={{ position: 'sticky', top: '75px' }}>
             <div style={{
-              borderRadius: '8px',
+              borderRadius: '6px',
               overflow: 'hidden',
               background: '#131518',
               border: '1px solid rgba(223, 186, 115, 0.25)',
               position: 'relative',
               width: '100%',
-              maxHeight: '520px',
-              height: '520px',
-              marginBottom: '0.85rem',
+              maxHeight: '430px',
+              height: '430px',
+              marginBottom: '0.75rem',
               boxShadow: 'var(--shadow-gold-glow)'
             }}>
               {images[selectedImage]?.resourceType === 'video' ||
