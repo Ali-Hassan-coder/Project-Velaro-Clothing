@@ -96,15 +96,15 @@ const ShopPage = () => {
 
 
   return (
-    <div style={{ padding: '3.5rem 0 6rem 0' }}>
+    <div style={{ padding: '2.5rem 0 4.5rem 0' }}>
       <div className="container">
         {/* Header Title */}
-        <div style={{ marginBottom: '2.5rem' }}>
-          <span className="badge-gold" style={{ marginBottom: '0.5rem' }}>ARCHIVAL CATALOG</span>
-          <h1 style={{ fontSize: '2.8rem', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
+        <div style={{ marginBottom: '2rem' }}>
+          <span className="badge-gold" style={{ marginBottom: '0.5rem', fontSize: '0.65rem' }}>ARCHIVAL CATALOG</span>
+          <h1 style={{ fontSize: '2rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
             {categoryParam ? categoryParam.replace('-', ' ') : 'All Collections'}
           </h1>
-          <p style={{ color: '#8E949D', fontSize: '0.95rem' }}>
+          <p style={{ color: '#8E949D', fontSize: '0.85rem' }}>
             High-tensile motorsport garments and luxury streetwear engineered for longevity.
           </p>
         </div>

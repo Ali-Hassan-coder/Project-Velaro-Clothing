@@ -75,20 +75,22 @@ const ProductDetailPage = () => {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-          gap: '3.5rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gap: '2.5rem',
           alignItems: 'start'
         }}>
           {/* LEFT: GALLERY WITH PHOTO & VIDEO SHOWCASE */}
-          <div>
+          <div style={{ position: 'sticky', top: '90px' }}>
             <div style={{
               borderRadius: '8px',
               overflow: 'hidden',
               background: '#131518',
               border: '1px solid rgba(223, 186, 115, 0.25)',
               position: 'relative',
-              paddingTop: '120%',
-              marginBottom: '1rem',
+              width: '100%',
+              maxHeight: '520px',
+              height: '520px',
+              marginBottom: '0.85rem',
               boxShadow: 'var(--shadow-gold-glow)'
             }}>
               {images[selectedImage]?.resourceType === 'video' ||
@@ -101,12 +103,10 @@ const ProductDetailPage = () => {
                   loop
                   playsInline
                   style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover'
+                    objectFit: 'contain',
+                    background: '#070809'
                   }}
                 />
               ) : (
@@ -114,12 +114,10 @@ const ProductDetailPage = () => {
                   src={images[selectedImage]?.url || images[0].url}
                   alt={displayName}
                   style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
+                    objectPosition: 'center top',
                     transition: 'transform 0.4s ease'
                   }}
                 />
@@ -128,7 +126,7 @@ const ProductDetailPage = () => {
 
             {/* Thumbnails supporting photo & video badges */}
             {images.length > 1 && (
-              <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto', paddingBottom: '4px' }}>
+              <div style={{ display: 'flex', gap: '0.6rem', overflowX: 'auto', paddingBottom: '4px' }}>
                 {images.map((media, i) => {
                   const isVid = media.resourceType === 'video' || media.url?.match(/\.(mp4|webm|mov|ogg)$/i);
                   return (
@@ -137,8 +135,8 @@ const ProductDetailPage = () => {
                       onClick={() => setSelectedImage(i)}
                       style={{
                         position: 'relative',
-                        width: '78px',
-                        height: '78px',
+                        width: '64px',
+                        height: '64px',
                         borderRadius: '4px',
                         overflow: 'hidden',
                         border: selectedImage === i ? '2px solid var(--color-gold)' : '1px solid rgba(255,255,255,0.1)',
@@ -198,19 +196,19 @@ const ProductDetailPage = () => {
               </button>
             </div>
 
-            <h1 style={{ fontSize: '2.4rem', marginBottom: '0.5rem', lineHeight: 1.15 }}>
+            <h1 style={{ fontSize: '1.9rem', marginBottom: '0.4rem', lineHeight: 1.15 }}>
               {displayName}
             </h1>
 
             {product.subtitle && (
-              <p style={{ color: '#8E949D', fontSize: '0.95rem', marginBottom: '1.2rem', fontFamily: 'var(--font-mono)' }}>
+              <p style={{ color: '#8E949D', fontSize: '0.85rem', marginBottom: '1rem', fontFamily: 'var(--font-mono)' }}>
                 {product.subtitle}
               </p>
             )}
 
             {/* Division Spec & Status */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#DFBA73', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.2rem', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#DFBA73', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em' }}>
                 SHOWCASE ARCHIVE • {product.sku || 'VEL-SPEC-09'}
               </span>
               {product.availabilityTag && (
@@ -224,7 +222,7 @@ const ProductDetailPage = () => {
             </div>
 
             {/* Description */}
-            <p style={{ color: '#C2C8D2', lineHeight: 1.7, marginBottom: '2rem', fontSize: '1rem' }}>
+            <p style={{ color: '#C2C8D2', lineHeight: 1.6, marginBottom: '1.5rem', fontSize: '0.9rem' }}>
               {product.description}
             </p>
 

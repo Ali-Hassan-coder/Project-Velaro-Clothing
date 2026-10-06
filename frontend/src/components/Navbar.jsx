@@ -43,15 +43,17 @@ const Navbar = () => {
       <div style={{
         backgroundColor: '#070809',
         borderBottom: '1px solid rgba(223, 186, 115, 0.12)',
-        fontSize: '0.75rem',
-        padding: '0.75rem 2.5rem',
-        minHeight: '44px',
+        fontSize: '0.7rem',
+        padding: '0.4rem 1.5rem',
+        minHeight: '36px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         color: '#9DA3AF',
-        letterSpacing: '0.06em',
-        width: '100%'
+        letterSpacing: '0.04em',
+        width: '100%',
+        maxWidth: '1240px',
+        margin: '0 auto'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
           <span style={{
@@ -172,15 +174,17 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Main navigation - Full Screen Fluid Spread */}
+      {/* Main navigation - Balanced Proportion Container */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
-        padding: '0 2.5rem',
-        minHeight: '84px',
-        gap: '1.5rem'
+        maxWidth: '1240px',
+        margin: '0 auto',
+        padding: '0 1.5rem',
+        minHeight: '68px',
+        gap: '1.25rem'
       }}>
         {/* Brand Logo with Enhanced VC Emblem */}
         <Link
@@ -188,7 +192,7 @@ const Navbar = () => {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '14px',
+            gap: '10px',
             textDecoration: 'none',
             flexShrink: 0
           }}
@@ -197,10 +201,10 @@ const Navbar = () => {
             src="/logo-gold.png"
             alt="Velaro Clothing Logo"
             style={{
-              width: '46px',
-              height: '46px',
+              width: '36px',
+              height: '36px',
               objectFit: 'contain',
-              filter: 'drop-shadow(0 0 10px rgba(223, 186, 115, 0.45))'
+              filter: 'drop-shadow(0 0 8px rgba(223, 186, 115, 0.4))'
             }}
             onError={(e) => {
               e.currentTarget.src = '/logo-light.png';
@@ -209,9 +213,9 @@ const Navbar = () => {
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{
               fontFamily: 'var(--font-heading)',
-              fontSize: '1.65rem',
+              fontSize: '1.35rem',
               fontWeight: 800,
-              letterSpacing: '0.18em',
+              letterSpacing: '0.15em',
               color: '#F5F5F7',
               lineHeight: 1
             }}>
@@ -219,25 +223,26 @@ const Navbar = () => {
             </span>
             <span style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.6rem',
-              letterSpacing: '0.34em',
+              fontSize: '0.55rem',
+              letterSpacing: '0.28em',
               color: '#DFBA73',
-              marginTop: '4px'
+              marginTop: '2px'
             }}>
               ROAD & RUNWAY ATELIER
             </span>
           </div>
         </Link>
 
-        {/* Desktop Category Navigation with equal spacing and aesthetic divider lines */}
+        {/* Desktop Category Navigation */}
         <nav
           style={{
             display: 'flex',
-            justifyContent: 'space-between',
             alignItems: 'center',
+            justifyContent: 'center',
+            gap: '1.4rem',
             flex: '1 1 auto',
-            maxWidth: '1000px',
-            margin: '0 1.5rem'
+            margin: '0 1rem',
+            whiteSpace: 'nowrap'
           }}
           className="desktop-nav"
         >
@@ -249,16 +254,12 @@ const Navbar = () => {
             All Works
           </NavLink>
 
-          <span style={{ width: '1px', height: '16px', background: 'rgba(223, 186, 115, 0.2)' }} />
-
           <NavLink
             to="/shop?category=leather-jackets"
             style={() => navLinkStyle(location.search.includes('leather-jackets'))}
           >
             Leather Jackets
           </NavLink>
-
-          <span style={{ width: '1px', height: '16px', background: 'rgba(223, 186, 115, 0.2)' }} />
 
           <NavLink
             to="/shop?category=hoodies-sweatshirts"
@@ -267,16 +268,12 @@ const Navbar = () => {
             Heavy Hoodies
           </NavLink>
 
-          <span style={{ width: '1px', height: '16px', background: 'rgba(223, 186, 115, 0.2)' }} />
-
           <NavLink
             to="/shop?category=streetwear"
             style={() => navLinkStyle(location.search.includes('streetwear'))}
           >
             Streetwear
           </NavLink>
-
-          <span style={{ width: '1px', height: '16px', background: 'rgba(223, 186, 115, 0.2)' }} />
 
           <NavLink
             to="/shop?category=sportswear"
@@ -285,16 +282,12 @@ const Navbar = () => {
             Sportswear
           </NavLink>
 
-          <span style={{ width: '1px', height: '16px', background: 'rgba(223, 186, 115, 0.2)' }} />
-
           <NavLink
             to="/shop?category=motorbike-riding-suits"
             style={() => navLinkStyle(location.search.includes('motorbike-riding-suits'))}
           >
             Racing Suits
           </NavLink>
-
-          <span style={{ width: '1px', height: '16px', background: 'rgba(223, 186, 115, 0.2)' }} />
 
           <NavLink
             to="/contact"
@@ -304,9 +297,8 @@ const Navbar = () => {
           </NavLink>
         </nav>
 
-
         {/* Right utility navigation */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexShrink: 0 }}>
           {/* Quick Search */}
           <form onSubmit={handleSearch} className="hide-sm" style={{ position: 'relative' }}>
             <input
@@ -318,11 +310,11 @@ const Navbar = () => {
                 background: 'rgba(255, 255, 255, 0.04)',
                 border: '1px solid rgba(223, 186, 115, 0.2)',
                 borderRadius: '4px',
-                padding: '0.42rem 0.8rem',
-                fontSize: '0.78rem',
+                padding: '0.35rem 0.75rem',
+                fontSize: '0.75rem',
                 color: '#FFF',
                 outline: 'none',
-                width: '160px',
+                width: '150px',
                 transition: 'all 0.2s'
               }}
             />
@@ -338,23 +330,24 @@ const Navbar = () => {
               gap: '6px',
               color: isActive ? '#DFBA73' : '#F5F5F7',
               textDecoration: 'none',
-              fontSize: '0.82rem',
+              fontSize: '0.78rem',
               fontWeight: 600,
-              padding: '0.4rem 0.8rem',
+              padding: '0.35rem 0.75rem',
               borderRadius: '20px',
               background: isActive ? 'rgba(223, 186, 115, 0.15)' : 'rgba(255, 255, 255, 0.04)',
               border: isActive ? '1px solid #DFBA73' : '1px solid rgba(223, 186, 115, 0.2)',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              whiteSpace: 'nowrap'
             })}
           >
-            <span style={{ color: '#DFBA73', fontSize: '0.95rem' }}>★</span>
+            <span style={{ color: '#DFBA73', fontSize: '0.9rem' }}>★</span>
             <span className="hide-sm">SAVED</span>
             <span style={{
               background: 'var(--color-gold)',
               color: '#0C0D0E',
-              fontSize: '0.7rem',
+              fontSize: '0.68rem',
               fontWeight: 800,
-              padding: '1px 6px',
+              padding: '1px 5px',
               borderRadius: '10px'
             }}>
               {wishlistCount}

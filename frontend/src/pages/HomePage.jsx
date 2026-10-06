@@ -149,34 +149,34 @@ const HomePage = () => {
           pointerEvents: 'none'
         }} />
 
-        <div className="container" style={{ position: 'relative', zIndex: 2, padding: '4rem 2rem' }}>
-          <div style={{ maxWidth: '820px' }}>
-            <div className="badge-gold" style={{ marginBottom: '1.25rem' }}>
+        <div className="container" style={{ position: 'relative', zIndex: 2, padding: '3.5rem 1.5rem' }}>
+          <div style={{ maxWidth: '720px' }}>
+            <div className="badge-gold" style={{ marginBottom: '1rem', fontSize: '0.65rem' }}>
               {heroSettings.commissionBadge || 'AUTUMN / WINTER ATELIER RELEASE'}
             </div>
             <h1 style={{
-              fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
-              lineHeight: 1.05,
-              marginBottom: '1.5rem',
+              fontSize: 'clamp(2rem, 4.5vw, 3.25rem)',
+              lineHeight: 1.08,
+              marginBottom: '1.25rem',
               textTransform: 'uppercase',
               whiteSpace: 'pre-line'
             }}>
               {heroSettings.headline || 'Crafted Without Compromise.\nBorn for Road & Runway.'}
             </h1>
             <p style={{
-              fontSize: '1.15rem',
+              fontSize: '1rem',
               color: '#C2C8D2',
               lineHeight: 1.6,
-              marginBottom: '2.5rem',
-              maxWidth: '640px'
+              marginBottom: '2rem',
+              maxWidth: '580px'
             }}>
               {heroSettings.subheadline || 'Raw motorsport durability forged with architectural streetwear aesthetics. Bespoke full-grain leather, heavy 500 GSM loopback cotton, and CE AAA-grade race protection.'}
             </p>
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <Link to={heroSettings.ctaLink || '/shop'} className="btn btn-primary">
+            <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap' }}>
+              <Link to={heroSettings.ctaLink || '/shop'} className="btn btn-primary" style={{ padding: '0.75rem 1.5rem', fontSize: '0.8rem' }}>
                 {heroSettings.ctaText || 'Explore The Collection'}
               </Link>
-              <Link to="/shop?category=motorbike-riding-suits" className="btn btn-outline">
+              <Link to="/shop?category=motorbike-riding-suits" className="btn btn-outline" style={{ padding: '0.75rem 1.5rem', fontSize: '0.8rem' }}>
                 Motorbike Suite Configurator
               </Link>
             </div>
@@ -217,22 +217,22 @@ const HomePage = () => {
       </section>
 
       {/* 3. THE FIVE PILLARS: CATEGORY SHOWCASE */}
-      <section style={{ padding: '6rem 0' }}>
+      <section style={{ padding: '4rem 0' }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '3rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
             <div>
-              <span className="badge-gold" style={{ marginBottom: '0.75rem' }}>SYSTEM DIVISIONS</span>
-              <h2 style={{ fontSize: '2.5rem', textTransform: 'uppercase' }}>The Five Pillars</h2>
+              <span className="badge-gold" style={{ marginBottom: '0.5rem', fontSize: '0.65rem' }}>SYSTEM DIVISIONS</span>
+              <h2 style={{ fontSize: '1.85rem', textTransform: 'uppercase' }}>The Five Pillars</h2>
             </div>
-            <Link to="/shop" style={{ color: '#DFBA73', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.05em' }}>
+            <Link to="/shop" style={{ color: '#DFBA73', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.05em' }}>
               VIEW ALL ARCHIVES →
             </Link>
           </div>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '1.5rem'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '1.25rem'
           }}>
             {(categories.length > 0 ? categories : defaultCategories).map((cat, idx) => {
               const catImg = cat.image?.url || cat.imageUrl || `/photo_${(idx % 2) + 1}.jpg`;
@@ -242,12 +242,12 @@ const HomePage = () => {
                   to={`/shop?category=${cat.slug}`}
                   className="atelier-card"
                   style={{
-                    height: '380px',
+                    height: '310px',
                     position: 'relative',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'flex-end',
-                    padding: '2rem',
+                    padding: '1.5rem',
                     textDecoration: 'none',
                     backgroundImage: `linear-gradient(to top, rgba(12, 13, 14, 0.95) 0%, rgba(12, 13, 14, 0.25) 60%, transparent 100%), url(${catImg})`,
                     backgroundSize: 'cover',
@@ -281,12 +281,12 @@ const HomePage = () => {
       </section>
 
       {/* 4. ICONIC PIECES (FEATURED PRODUCTS) */}
-      <section style={{ padding: '4rem 0 6rem 0', backgroundColor: '#0B0C0E', borderTop: '1px solid rgba(223, 186, 115, 0.1)' }}>
+      <section style={{ padding: '3.5rem 0 4.5rem 0', backgroundColor: '#0B0C0E', borderTop: '1px solid rgba(223, 186, 115, 0.1)' }}>
         <div className="container">
-          <div style={{ textAlign: 'center', maxWidth: '650px', margin: '0 auto 4rem auto' }}>
-            <span className="badge-gold" style={{ marginBottom: '0.75rem' }}>ATELIER HIGHLIGHTS</span>
-            <h2 style={{ fontSize: '2.5rem', textTransform: 'uppercase', marginBottom: '1rem' }}>Iconic Works</h2>
-            <p style={{ color: '#8E949D', fontSize: '0.95rem' }}>
+          <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto 2.5rem auto' }}>
+            <span className="badge-gold" style={{ marginBottom: '0.5rem', fontSize: '0.65rem' }}>ATELIER HIGHLIGHTS</span>
+            <h2 style={{ fontSize: '1.85rem', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Iconic Works</h2>
+            <p style={{ color: '#8E949D', fontSize: '0.85rem' }}>
               Engineered with proprietary tannery finishes, reinforced stress joints, and custom hardware.
             </p>
           </div>
@@ -294,17 +294,17 @@ const HomePage = () => {
           {featuredProducts.length > 0 ? (
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '2rem'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '1.5rem'
             }}>
               {featuredProducts.map((p) => (
                 <ProductCard key={p._id || p.id} product={p} />
               ))}
             </div>
           ) : (
-            <div style={{ textAlign: 'center', padding: '3rem', color: '#8E949D' }}>
+            <div style={{ textAlign: 'center', padding: '2.5rem', color: '#8E949D' }}>
               <p>Explore our complete catalog in the archives.</p>
-              <Link to="/shop" className="btn btn-primary" style={{ marginTop: '1.5rem' }}>
+              <Link to="/shop" className="btn btn-primary" style={{ marginTop: '1.25rem' }}>
                 Browse All Pieces
               </Link>
             </div>
@@ -314,22 +314,22 @@ const HomePage = () => {
 
       {/* 5. BESPOKE ATELIER BANNER */}
       <section style={{
-        padding: '6rem 0',
+        padding: '4rem 0',
         background: 'linear-gradient(rgba(12, 13, 14, 0.85), rgba(12, 13, 14, 0.85)), url("/photo_2.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         borderTop: '1px solid rgba(223, 186, 115, 0.15)',
         borderBottom: '1px solid rgba(223, 186, 115, 0.15)'
       }}>
-        <div className="container" style={{ textAlign: 'center', maxWidth: '750px' }}>
-          <span className="badge-gold" style={{ marginBottom: '1rem' }}>BESPOKE COMMISSIONS</span>
-          <h2 style={{ fontSize: '2.5rem', textTransform: 'uppercase', marginBottom: '1.25rem' }}>
+        <div className="container" style={{ textAlign: 'center', maxWidth: '680px' }}>
+          <span className="badge-gold" style={{ marginBottom: '0.75rem', fontSize: '0.65rem' }}>BESPOKE COMMISSIONS</span>
+          <h2 style={{ fontSize: '1.85rem', textTransform: 'uppercase', marginBottom: '1rem' }}>
             Custom Tailored To Your Exact Silhouette
           </h2>
-          <p style={{ color: '#C2C8D2', fontSize: '1rem', lineHeight: 1.6, marginBottom: '2.5rem' }}>
+          <p style={{ color: '#C2C8D2', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: '2rem' }}>
             From individual rider aerodynamic measurements to exclusive hide choices and custom-machined metal hardware, our master tailors accept private commissions worldwide.
           </p>
-          <Link to="/contact" className="btn btn-primary">
+          <Link to="/contact" className="btn btn-primary" style={{ padding: '0.75rem 1.5rem', fontSize: '0.8rem' }}>
             Initiate Bespoke Order
           </Link>
         </div>

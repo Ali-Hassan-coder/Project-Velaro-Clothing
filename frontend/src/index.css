@@ -44,7 +44,7 @@
   --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.45);
   --shadow-gold-glow: 0 0 24px rgba(223, 186, 115, 0.15);
 
-  --max-width: 1400px;
+  --max-width: 1240px;
 }
 
 /* Reset & Basics */
@@ -52,6 +52,10 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+html {
+  font-size: 15px;
 }
 
 body {
@@ -66,7 +70,7 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
   font-weight: 700;
   color: var(--color-text-primary);
 }
@@ -85,7 +89,7 @@ button {
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
   background: var(--bg-main);
@@ -116,10 +120,11 @@ button {
 .container {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
 }
+
 /* Responsive utilities */
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
   .desktop-nav {
     display: none !important;
   }

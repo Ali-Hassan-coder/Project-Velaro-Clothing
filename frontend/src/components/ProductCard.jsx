@@ -65,7 +65,7 @@ const ProductCard = ({ product }) => {
       </button>
 
       {/* Image container */}
-      <Link to={`/product/${product.slug || productId}`} style={{ overflow: 'hidden', display: 'block', position: 'relative', paddingTop: '125%', background: '#16191D' }}>
+      <Link to={`/product/${product.slug || productId}`} style={{ overflow: 'hidden', display: 'block', position: 'relative', paddingTop: '112%', background: '#16191D' }}>
         <img
           src={primaryImage}
           alt={displayName}
@@ -84,21 +84,21 @@ const ProductCard = ({ product }) => {
       </Link>
 
       {/* Content */}
-      <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+      <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
         {/* Category division code */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-          <span style={{ fontSize: '0.72rem', color: '#DFBA73', fontFamily: 'var(--font-mono)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+          <span style={{ fontSize: '0.68rem', color: '#DFBA73', fontFamily: 'var(--font-mono)' }}>
             {product.category?.divisionNumber ? `DIV // ${product.category.divisionNumber}` : (product.category?.divisionCode || 'DIV // 01')}
           </span>
           {(product.rating > 0 || product.ratings?.average > 0) && (
-            <span style={{ fontSize: '0.75rem', color: '#CA7D4B' }}>
+            <span style={{ fontSize: '0.72rem', color: '#CA7D4B' }}>
               ★ {(product.rating || product.ratings?.average || 5.0).toFixed(1)} ({product.numReviews || product.ratings?.count || 1})
             </span>
           )}
         </div>
 
         {/* Title */}
-        <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.4rem', lineHeight: 1.3 }}>
+        <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '0.35rem', lineHeight: 1.25 }}>
           <Link to={`/product/${product.slug || productId}`} style={{ color: '#F5F5F7', textDecoration: 'none' }}>
             {displayName}
           </Link>
