@@ -31,20 +31,30 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 
 // CORS
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://127.0.0.1:5173',
-  'http://127.0.0.1:5174'
-].filter(Boolean);
+const allowedOrigins = (process.env.CLIENT_URL || '')
+  .split(',')
+  .map(url => url.trim())
+  .filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, curl, postman) or matching dev ports
-    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV === 'development') {
+    // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+
+    // Allow in development or if explicitly configured
+    if (process.env.NODE_ENV === 'development' || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
       return callback(null, true);
     }
+
+    // Allow Vercel deployments and localhost ports
+    if (
+      origin.endsWith('.vercel.app') ||
+      origin.includes('localhost:') ||
+      origin.includes('127.0.0.1:')
+    ) {
+      return callback(null, true);
+    }
+
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
