@@ -10,7 +10,7 @@ const ContactPage = () => {
   });
   const [submitted, setSubmitted] = useState(false);
 
-  const instagramUrl = 'https://www.instagram.com/velaroclothing_?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw==';
+  const instagramUrl = 'https://www.instagram.com/velaroclothing.co?utm_source=ig_web_button_share_sheet&srtk=ZDNlZDc0MzIxNw==';
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -81,7 +81,7 @@ const ContactPage = () => {
                 <span style={{ fontSize: '0.72rem', color: '#DFBA73', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em' }}>
                   OFFICIAL ATELIER CHANNEL
                 </span>
-                <h3 style={{ fontSize: '1.4rem', color: '#FFF' }}>@velaroclothing_</h3>
+                <h3 style={{ fontSize: '1.4rem', color: '#FFF' }}>@velaroclothing.co</h3>
               </div>
             </div>
 

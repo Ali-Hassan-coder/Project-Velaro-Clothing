@@ -317,7 +317,7 @@ const ProductDetailPage = () => {
                   ATELIER INQUIRY SPECIFICATION
                 </span>
                 <span style={{ fontSize: '0.72rem', color: '#9DA3AF' }}>
-                  Direct Message @velaroclothing_
+                  Direct Message @velaroclothing.co
                 </span>
               </div>
 
@@ -343,7 +343,7 @@ const ProductDetailPage = () => {
                   onClick={() => {
                     const text = `Hi Velaro Clothing Atelier! I'd like to inquire about this piece:\n\n[VELARO SPEC: ${displayName} | SKU: ${product.sku || 'CUSTOM'} | Size: ${selectedSize || 'Bespoke'}${selectedArmor ? ` | Armor: ${selectedArmor}` : ''}]\n\nCould you please share availability and commission timeline?`;
                     navigator.clipboard?.writeText(text);
-                    window.open('https://www.instagram.com/velaroclothing_?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw==', '_blank');
+                    window.open('https://www.instagram.com/velaroclothing.co?utm_source=ig_web_button_share_sheet&srtk=ZDNlZDc0MzIxNw==', '_blank');
                   }}
                 >
                   📋 Copy Spec & Open Instagram ↗

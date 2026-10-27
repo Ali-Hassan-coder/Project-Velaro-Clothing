@@ -33,7 +33,11 @@ const LoginPage = () => {
         navigate('/');
       }
     } catch (err) {
-      setError(err.message || 'Authentication failed. Please verify credentials.');
+      if (err.code === 'ERR_NETWORK' || !err.response) {
+        setError('Network Error: Unable to reach the server. If Render backend was asleep, please wait 30 seconds and retry.');
+      } else {
+        setError(err.response?.data?.message || err.message || 'Authentication failed. Please verify credentials.');
+      }
     } finally {
       setSubmitting(false);
     }

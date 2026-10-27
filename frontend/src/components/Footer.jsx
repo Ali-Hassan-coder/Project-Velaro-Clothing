@@ -43,7 +43,7 @@ const Footer = () => {
             {/* Social Media Links */}
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: '1rem' }}>
               <a
-                href="https://www.instagram.com/velaroclothing_?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw=="
+                href="https://www.instagram.com/velaroclothing.co?utm_source=ig_web_button_share_sheet&srtk=ZDNlZDc0MzIxNw=="
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Follow Velaro Clothing on Instagram"
@@ -119,13 +119,13 @@ const Footer = () => {
               Connect with our official Instagram channel and join our private list for atelier showcase previews.
             </p>
             <a
-              href="https://www.instagram.com/velaroclothing_?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw=="
+              href="https://www.instagram.com/velaroclothing.co?utm_source=ig_web_button_share_sheet&srtk=ZDNlZDc0MzIxNw=="
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-outline btn-sm"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
             >
-              Follow @velaroclothing_ →
+              Follow @velaroclothing.co →
             </a>
           </div>
         </div>
@@ -201,7 +201,7 @@ const Footer = () => {
 
           <div style={{ display: 'flex', gap: '1.5rem' }}>
             <a
-              href="https://www.instagram.com/velaroclothing_?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw=="
+              href="https://www.instagram.com/velaroclothing.co?utm_source=ig_web_button_share_sheet&srtk=ZDNlZDc0MzIxNw=="
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: '#DFBA73' }}
