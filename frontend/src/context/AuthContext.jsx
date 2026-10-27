@@ -32,27 +32,35 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const res = await authApi.login({ email, password });
-    if (res.data?.success) {
-      const { user: loggedInUser, accessToken } = res.data.data;
-      localStorage.setItem('velaro_token', accessToken);
-      localStorage.setItem('velaro_user', JSON.stringify(loggedInUser));
-      setUser(loggedInUser);
-      return loggedInUser;
+    try {
+      const res = await authApi.login({ email, password });
+      if (res.data?.success) {
+        const { user: loggedInUser, accessToken } = res.data.data;
+        localStorage.setItem('velaro_token', accessToken);
+        localStorage.setItem('velaro_user', JSON.stringify(loggedInUser));
+        setUser(loggedInUser);
+        return loggedInUser;
+      }
+      throw new Error(res.data?.message || 'Login failed');
+    } catch (err) {
+      throw err;
     }
-    throw new Error(res.data?.message || 'Login failed');
   };
 
   const register = async (userData) => {
-    const res = await authApi.register(userData);
-    if (res.data?.success) {
-      const { user: newUser, accessToken } = res.data.data;
-      localStorage.setItem('velaro_token', accessToken);
-      localStorage.setItem('velaro_user', JSON.stringify(newUser));
-      setUser(newUser);
-      return newUser;
+    try {
+      const res = await authApi.register(userData);
+      if (res.data?.success) {
+        const { user: newUser, accessToken } = res.data.data;
+        localStorage.setItem('velaro_token', accessToken);
+        localStorage.setItem('velaro_user', JSON.stringify(newUser));
+        setUser(newUser);
+        return newUser;
+      }
+      throw new Error(res.data?.message || 'Registration failed');
+    } catch (err) {
+      throw err;
     }
-    throw new Error(res.data?.message || 'Registration failed');
   };
 
   const logout = () => {
