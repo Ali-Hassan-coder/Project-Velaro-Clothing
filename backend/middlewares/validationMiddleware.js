@@ -25,7 +25,7 @@ const registerRules = [
 ];
 
 const loginRules = [
-  body('email').isEmail().withMessage('Please provide a valid email').normalizeEmail(),
+  body('email').trim().isEmail().withMessage('Please provide a valid email').normalizeEmail(),
   body('password').notEmpty().withMessage('Password is required'),
 ];
 

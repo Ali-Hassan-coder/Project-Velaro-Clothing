@@ -58,9 +58,51 @@ const updateProfile = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * @route   POST /api/auth/reset-admin
+ * @desc    Reset or initialize admin credentials
+ */
+const resetAdmin = catchAsync(async (req, res) => {
+  const { secretKey, email, newPassword } = req.body;
+  const adminSecret = process.env.JWT_SECRET || 'velaro_clothing_jwt_secret_key_change_in_production_2026';
+  
+  if (!secretKey || secretKey !== adminSecret) {
+    return res.status(403).json({ success: false, message: 'Invalid admin secret key.' });
+  }
+
+  const targetEmail = (email || 'admin@velaroclothing.com').toLowerCase().trim();
+  const targetPassword = newPassword || 'admin123456';
+
+  const User = require('../models/User');
+  let user = await User.findOne({ where: { email: targetEmail } });
+
+  if (user) {
+    user.password = targetPassword;
+    user.role = 'admin';
+    user.isActive = true;
+    await user.save();
+  } else {
+    user = await User.create({
+      firstName: 'Velaro',
+      lastName: 'Admin',
+      email: targetEmail,
+      password: targetPassword,
+      role: 'admin',
+      isActive: true,
+    });
+  }
+
+  res.json({
+    success: true,
+    message: 'Admin account credentials updated successfully.',
+    data: { email: targetEmail },
+  });
+});
+
 module.exports = {
   register,
   login,
   getProfile,
   updateProfile,
+  resetAdmin,
 };

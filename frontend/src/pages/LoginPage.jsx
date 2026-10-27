@@ -18,8 +18,9 @@ const LoginPage = () => {
     setError('');
     setSubmitting(true);
     try {
+      const cleanEmail = email.trim();
       if (isLogin) {
-        const loggedUser = await login(email, password);
+        const loggedUser = await login(cleanEmail, password.trim());
         if (loggedUser?.role === 'admin') {
           navigate('/admin');
         } else {
@@ -29,14 +30,17 @@ const LoginPage = () => {
         const parts = name.trim().split(' ');
         const firstName = parts[0] || 'Patron';
         const lastName = parts.slice(1).join(' ') || 'Client';
-        await register({ firstName, lastName, email, password });
+        await register({ firstName, lastName, email: cleanEmail, password });
         navigate('/');
       }
     } catch (err) {
-      if (err.code === 'ERR_NETWORK' || !err.response) {
-        setError('Network Error: Unable to reach the server. If Render backend was asleep, please wait 30 seconds and retry.');
+      const serverMessage = err.response?.data?.message;
+      if (serverMessage) {
+        setError(serverMessage);
+      } else if (err.code === 'ERR_NETWORK' || !err.response) {
+        setError('Network Error: The live backend is currently waking up or unreachable. Please wait 15-20 seconds and click again.');
       } else {
-        setError(err.response?.data?.message || err.message || 'Authentication failed. Please verify credentials.');
+        setError(err.message || 'Authentication failed. Please verify credentials.');
       }
     } finally {
       setSubmitting(false);
