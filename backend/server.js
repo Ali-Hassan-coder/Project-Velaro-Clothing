@@ -46,8 +46,9 @@ app.use(cors({
       return callback(null, true);
     }
 
-    // Allow Vercel deployments and localhost ports
+    // Allow custom domain, Vercel deployments, and localhost ports
     if (
+      origin.includes('velaro-clothing.com') ||
       origin.endsWith('.vercel.app') ||
       origin.includes('localhost:') ||
       origin.includes('127.0.0.1:')
