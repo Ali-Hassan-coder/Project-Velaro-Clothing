@@ -10,6 +10,7 @@ const AdminDashboard = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
   const [activeTab, setActiveTab] = useState('inventory'); // 'inventory', 'hero', 'categories'
   const [editingCategory, setEditingCategory] = useState(null);
