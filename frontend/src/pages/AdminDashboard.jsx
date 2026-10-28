@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { adminApi, productApi, categoryApi } from '../api';
+import { adminApi, productApi, categoryApi, uploadApi } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { Navigate, Link } from 'react-router-dom';
 
@@ -501,9 +501,7 @@ const AdminDashboard = () => {
                         const data = new FormData();
                         data.append('image', file);
                         try {
-                          const res = await (await import('../api/axiosConfig')).default.post('/upload/single', data, {
-                            headers: { 'Content-Type': 'multipart/form-data' },
-                          });
+                          const res = await uploadApi.uploadSingle(data);
                           if (res.data?.data?.url) {
                             const isVid = file.type.startsWith('video');
                             setHeroSettings((prev) => ({
@@ -716,9 +714,7 @@ const AdminDashboard = () => {
                       const data = new FormData();
                       data.append('image', file);
                       try {
-                        const res = await (await import('../api/axiosConfig')).default.post('/upload/single', data, {
-                          headers: { 'Content-Type': 'multipart/form-data' },
-                        });
+                        const res = await uploadApi.uploadSingle(data);
                         if (res.data?.data?.url) {
                           setEditingCategory((prev) => ({
                             ...prev,
@@ -881,9 +877,7 @@ const AdminDashboard = () => {
                         const data = new FormData();
                         data.append('image', file);
                         try {
-                          const res = await (await import('../api/axiosConfig')).default.post('/upload/single', data, {
-                            headers: { 'Content-Type': 'multipart/form-data' },
-                          });
+                          const res = await uploadApi.uploadSingle(data);
                           if (res.data?.data?.url) {
                             setFormData((prev) => ({
                               ...prev,

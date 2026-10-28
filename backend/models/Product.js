@@ -137,10 +137,14 @@ const Product = sequelize.define(
     hooks: {
       beforeValidate: (prod) => {
         if (prod.name && !prod.slug) {
-          prod.slug = prod.name
+          const baseSlug = prod.name
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/(^-|-$)/g, '');
+          prod.slug = `${baseSlug}-${Math.random().toString(36).substring(2, 7)}`;
+        }
+        if (!prod.sku) {
+          prod.sku = `VEL-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
         }
       },
     },

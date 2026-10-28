@@ -35,7 +35,12 @@ const productRules = [
   body('name').trim().notEmpty().withMessage('Product name is required'),
   body('description').trim().notEmpty().withMessage('Description is required'),
   body('price').isFloat({ min: 0 }).withMessage('Price must be a positive number'),
-  body('category').notEmpty().withMessage('Category is required'),
+  body().custom((val, { req }) => {
+    if (!req.body.category && !req.body.categoryId) {
+      throw new Error('Category is required');
+    }
+    return true;
+  }),
 ];
 
 const productQueryRules = [

@@ -38,3 +38,14 @@ export const adminApi = {
   updateSetting: (key, value) => api.put(`/admin/settings/${key}`, { value }),
 };
 
+export const uploadApi = {
+  uploadSingle: (formData) =>
+    api.post('/upload/single', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+  uploadMultiple: (formData) =>
+    api.post('/upload/multiple', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+};
+

@@ -5,7 +5,7 @@ const fs = require('fs');
  * Upload a media file (image or video)
  * If Cloudinary is configured, upload to Cloudinary. Otherwise, serve via local static URL.
  */
-const uploadMediaFile = async (file, folder = 'velaro-clothing/media') => {
+const uploadMediaFile = async (file, folder = 'velaro-clothing/media', fallbackHost = null) => {
   const isVideo = file.mimetype.startsWith('video/');
   const resourceType = isVideo ? 'video' : 'image';
   const hasCloudinary =
@@ -37,7 +37,7 @@ const uploadMediaFile = async (file, folder = 'velaro-clothing/media') => {
   }
 
   // Fallback: local static server url
-  const serverUrl = process.env.SERVER_URL || 'http://localhost:5000';
+  const serverUrl = process.env.SERVER_URL || fallbackHost || 'https://project-velaro-clothing-backend.onrender.com';
   return {
     url: `${serverUrl}/uploads/${file.filename}`,
     publicId: file.filename,
@@ -48,8 +48,8 @@ const uploadMediaFile = async (file, folder = 'velaro-clothing/media') => {
 /**
  * Upload multiple media files
  */
-const uploadMultipleMedia = async (files, folder = 'velaro-clothing/media') => {
-  const uploadPromises = files.map((file) => uploadMediaFile(file, folder));
+const uploadMultipleMedia = async (files, folder = 'velaro-clothing/media', fallbackHost = null) => {
+  const uploadPromises = files.map((file) => uploadMediaFile(file, folder, fallbackHost));
   return Promise.all(uploadPromises);
 };
 
